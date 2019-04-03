@@ -1,5 +1,9 @@
 package flowershop.backend.entity;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+
 public class Flower {
     private String title;
     private float price;
@@ -9,6 +13,12 @@ public class Flower {
         this.title = title;
         this.price = price;
         this.count = count;
+    }
+
+    public Flower(@NotNull Flower flower){
+        this.title = flower.title;
+        this.price = flower.price;
+        this.count = flower.count;
     }
 
     public String getTitle() {
@@ -33,5 +43,29 @@ public class Flower {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Flower flower = (Flower) o;
+        return Float.compare(flower.price, price) == 0 &&
+                count == flower.count &&
+                title.equals(flower.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, price, count);
+    }
+
+    @Override
+    public String toString() {
+        return "Flower{" +
+                "title='" + title + '\'' +
+                ", price=" + price +
+                ", count=" + count +
+                '}';
     }
 }

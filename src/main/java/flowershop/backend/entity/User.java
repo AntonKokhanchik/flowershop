@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class User {
+public class User extends Entity{
     // TODO: temporary admn solution
     public static final User ADMIN = new User("admin", "admin123");
 

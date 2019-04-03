@@ -1,10 +1,11 @@
 package flowershop.backend.entity;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class Flower {
+public class Flower extends Entity{
     private String title;
     private float price;
     private int count;

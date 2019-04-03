@@ -6,7 +6,7 @@ import java.util.Objects;
 import flowershop.backend.OrderStatus;
 import org.jetbrains.annotations.NotNull;
 
-public class Order {
+public class Order extends Entity{
     private int fullPrice;
     private Calendar dateCreation;
     private Calendar dateClosing;

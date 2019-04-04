@@ -35,4 +35,6 @@ public class UserService implements EntityService <User>{
     public boolean validate(User entity) {
         return false;
     }
+
+    public User getAdmin(){ return null; }
 }

@@ -3,8 +3,6 @@ package flowershop.backend.entity;
 import java.util.Objects;
 
 public class User extends Entity{
-    // TODO: temporary admn solution
-    public static final User ADMIN = new User("admin", "admin123");
 
     private String login;
     private String password;

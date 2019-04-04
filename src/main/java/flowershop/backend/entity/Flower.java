@@ -1,8 +1,5 @@
 package flowershop.backend.entity;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Objects;
 
 public class Flower extends Entity{
@@ -16,7 +13,7 @@ public class Flower extends Entity{
         this.count = count;
     }
 
-    public Flower(@NotNull Flower flower){
+    public Flower(Flower flower){
         this.title = flower.title;
         this.price = flower.price;
         this.count = flower.count;

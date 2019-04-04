@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.Objects;
 
 import flowershop.backend.OrderStatus;
-import org.jetbrains.annotations.NotNull;
 
 public class Order extends Entity{
     private int fullPrice;
@@ -19,7 +18,7 @@ public class Order extends Entity{
         this.status = status;
     }
 
-    public Order(@NotNull Order order){
+    public Order(Order order){
         this.fullPrice = order.fullPrice;
         this.dateCreation = order.dateCreation;
         this.dateClosing = order.dateClosing;

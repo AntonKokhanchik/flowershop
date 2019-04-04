@@ -1,7 +1,5 @@
 package flowershop.backend.entity;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Objects;
 
 public class User extends Entity{
@@ -31,7 +29,7 @@ public class User extends Entity{
         this.discount = discount;
     }
 
-    public User(@NotNull User user){
+    public User(User user){
         this.login = user.login;
         this.password = user.password;
         this.fullName = user.fullName;

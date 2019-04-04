@@ -1,0 +1,202 @@
+Задача:
+
+- Приложение должно поддерживать 2 вида пользователей – обычные покупатели и администратор магазина.
+- Все пользователи имеют основные атрибуты для аутентификации: логин и пароль.
+Логин пользователя в системе должен быть уникален.
+- Покупатели имеют дополнительные атрибуты: ФИО, адрес, телефон, денежный баланс (например, 550.05р.),
+скидка в % (целочисленная, например, 3%)
+- Администратором магазина является единственный пользователь. Администратор должен быть
+заранее заведен в системе, логин – admin, пароль – admin123.
+- Для входа в приложения пользователь должен ввести корректные логин/пароль на странице входа.
+При вводе неверных данных пользователю должна отображаться ошибка.
+- На странице входа должна быть возможность перейти на страницу регистрации пользователя.
+При регистрации пользователь вводит свои данные и пароль. После успешной регистрации
+пользователь попадает на страницу входа. При регистрации пользователь получает 2000р на счет.
+- При регистрации должна проверяться уникальности логина нового пользователя.
+
+- После успешной аутентификации пользователь попадает на основную страницу приложения.
+На главной странице покупателя отображается приветствие с логином пользователя, баланс, скидка и кнопка «выход».
+По нажатию на кнопку выход сессия пользователя завершается, данные корзины очищаются, пользователь перенаправляется
+на страницу входа.
+- Также на главной странице отображается каталог цветов. Он представляет собой таблицу с данными:
+название цветка, цена цветка, кол-во на складе. Пользователь может производить поиск цветка по названию,
+либо по диапазону цен. В каталоге пользователь может указать кол-во цветков для заказа (<= кол-ву на складе)
+и добавить их в корзину.
+- Корзина представляет собой таблицу с данными: название цветка, кол-во заказанных цветов, суммарная цена за вид цветка.
+Также должна отображаться общая стоимость заказа в корзине, с учетом скидки. Данные корзины сохраняются в
+сессии пользователя. Корзина отображается также на главной странице пользователя.
+При наличии цветов в корзине должна быть доступна кнопка «создать заказ». При создании заказа корзина очищается,
+все данные о заказанных цветах сохраняются в рамках заказа.
+
+- В заказе сохраняются суммарная цена заказа (с учетом скидки клиента), дата создания заказа, дата закрытия заказа,
+статус заказа. После создания заказ получает статус «создан» и отображается в таблице заказов пользователя.
+Напротив заказов в статусе «создан» отображается кнопка «оплатить». Таблица заказов пользователя отображается на
+главной странице.
+- При нажатии на кнопку «оплатить» должна происходить оплата заказа: проверяется достаточно ли средств и
+покупателя для оплаты, списываются средства со счета, заказ переходит в статус «оплачен».
+- После успешной аутентификации администратор попадает на основную администраторскую страницу приложения.
+На ней отображаются все заказы пользователей с сортировкой по дате создания и статусу.
+- Напротив заказов в статусе «оплачен» отображается кнопка «закрыть».  Администратор закрывает заказы после того,
+как они были доставлены клиенту.
+
+[ ] - undone
+[+] - partially done
+[x] - done
+
+todo-list:
+[x] Module 1 Activity:
+    [x] Install Tomcat v8 (\\10.10.10.41\Shared\Everyone\JAVA_Capability\Distr)
+        Just unzip tomcat to the desired location.
+    [x] Start Tomcat. To run tomcat you should set JAVA_HOME environment variable.
+        Control Panel\System and Security\System -> Advanced System Settings -> Environment variables.
+        For example JAVA_HOME = C:\Program Files\Java\jdk1.8.0_144.
+        Then start Tomcat with <tomcat folder>/bin/startup.bat
+        Check availability of tomcat web console - http://localhost:8080/
+    [x] (no hellowebapp)
+        [x] Install hellowebapp.war. Take file from \EE\samples-project\hellowebapp\target and put
+            it in <tomcat folder>\webapps for auto deploy
+        [x] Test application. Check http://localhost:8080/hellowebapp for welcome page.
+            Use http://localhost:8080/hellowebapp/hello?name=Dmitry to test greeting servlet
+        [x] Explore war content. Rename war file extension to zip and unzip the file to view its internal structure.
+            Find web.xml file, java classes, used libs and jsps
+
+
+[x] Module 2 Activity. Part 1:
+    [x] Download apache-maven-3.3.9-bin.zip from https://maven.apache.org/download.cgi
+    [x] Extract distribution archive in directory C:\Program Files
+    [x] Check environment variable value JAVA_HOME
+    [x] Set Maven environment variables:
+        M2_HOME = C:\Program Files\apache-maven-3.3.9
+        M2 = %M2_HOME%\bin
+        Append the string ;%M2% to the end of the system variable Path
+    [x] Verify Maven installation of command mvn –version
+    [x] For Eclipse:
+        Select the installation used to launch Maven (Preferences -> Maven   -> Installations)
+
+[x] Module 2 Activity. Part 2:
+    [x] Create maven project:
+            archetype - maven-archetype-webapp
+            groupId - com.accenture
+            artifactId – flowershop
+            packaging – war
+            version - 0.0.1
+    [x] Plug in apache-maven-compiler plugin and set version JVM for compilation source code
+    [x] Build project and check your war artifact in your local repository
+    [x] Run artifact with tomcat maven plugin
+
+[x] Module 3 Activity:
+    [x] Install git (https://git-scm.com/downloads)
+    [x] Set your name and email
+        git config --global user.name "John Doe"
+        git config --global user.email johndoe@example.com
+    [x] Init repo for your FlowerShop project
+        git init
+    [x] Create git.ignore file to ignore /target folder and eclipse project files for git
+    [x] Make initial commit
+        git add .
+        git commit –m “Initial commit”
+    [x] Commit changes to repo after stable features implemented (like in 5 but with feature description in commit)
+
+TODO[ ] Module 4 Activity:
+    [+] Create FlowerShop application package structure
+    [+] Create entities, DTOs stubs (no attributes) that should be in application
+    [+] Create business and access services interfaces with needed methods (no implementation required)
+
+TODO[ ] Module 5 Activity:
+    [ ] Introduce spring context to the Flowers shop web application
+    [ ] Create empty implementation classes for business and access services, annotate them as beans
+    [ ] Inject access services beans to dependent business services
+    [ ] Add some System.out to beans constructors to check beans creation during application startup
+
+TODO[ ] Module 6 Activity:
+    [ ] Add both slf4j dependencies to your project pom
+    [ ] Find and add relevant logback dependency from central maven repo (https://mvnrepository.com/)
+    [ ] Introduce logging to the Flowers shop web application. Change System.out calls to logging calls
+
+TODO[ ] Module 7 Activity. Part 1:
+    [ ] Create login page with
+        Form with login/password inputs
+        Login button calling Login servlet with form data
+        Register button forwarding to register page
+    [ ] Create register page with
+        User info inputs(login, name, password, etc.)
+        Register button calling Register servlet with form data
+    [ ] Create main page with
+        Logged user info (name, discount, balance) from session
+        Logout button erasing session and forwarding to login page
+
+TODO[ ] Module 7 Activity. Part 2:
+    [ ] Fill User and UserDto classes with user attributes
+        Create login servlet
+        Pass data to business service
+        If logged successfully, put user into session, redirect to main page
+        Else show error
+    [ ] Create register servlet
+        Pass data to business service
+        Redirect to login page
+
+TODO[ ] Module 8 Activity:
+    [ ] Create DataSource on tomcat
+        You will need to put following artifact jars to Tomcat/lib:
+        commons-dbcp:commons-dbcp:1.4 (download from maven central)
+        com.h2database:1.4.XXX (copy from H2/bin)
+    [ ] Integrate JPA(+Transactions) with Spring and Hibernate
+    [ ] Write DB scripts to create user table, integrate flyway to application
+    [ ] Use DB access layer to implement user login/registration using H2 DB
+    [ ] Implement other application functionality according to application requirements
+
+TODO[ ] Module 9 Activity:
+    [ ] Add maven dependencies:
+        spring-oxm 4.2.0.RELEASE
+        Castor 1.2
+        xercesImpl 2.8.1
+    [ ] Create UserMarshgallingServiceImpl service which can convert given user object to XML and put
+        file with XML content to target file directory:
+        Target directory location should be set in property configuration file
+        Use org.springframework.oxm.castor.CastorMarshaller to marshall user object to XML
+    [ ] Call UserMarshgallingServiceImpl method after each user successful registration
+
+TODO[ ] Module 10 Activity:
+    [ ] Introduce Apache CXF to flower shop application
+    [ ] Implement web service(FlowersStockWebService) with single operation: increaseFlowersStockSize (int count)
+        – increases amount of flowers of all types on count parameter
+    [ ] Install SOAP UI application – tool for testing Web Services
+        https://www.soapui.org/
+    [ ] Load your WSDL to SOAP UI and test increaseFlowersStockSize service
+    [ ] Create standalone Java application with Web service client for FlowersStockWebService.
+        Application should call increaseFlowersStockSize each 10 minutes and increase stock size
+        on random number from 10 to 30.
+
+TODO[ ] Module 11 Activity:
+    [ ] Add jersey dependencies (v2.24.1):
+        jersey-container-servlet
+        jersey-media-json-jackson
+        jersey-spring3
+    [ ] Configure Jersey in web.xml
+    [ ] Create restful web service that receives user login as parameter and returns true if given login is
+        already exists and application and false if not
+    [ ] Call this rest service from registration page on each login input field change
+        (use Jquery.ajax to call rest service). Show user the information message if inputted
+        login already exists. Register button should be disabled in that case.
+
+TODO[ ] Module 12 Activity:
+    [ ] Install Apache ActiveMQ 5.14.1 – open source messaging provider
+        http://activemq.apache.org/download.html
+    [ ] Run Apache ActiveMQ with <AMQ location>/bin\win64\activemq.bat
+        AMQ web interface url: http://localhost:8161/admin/
+        Login/Password: admin/admin
+    [ ] Create 2 queues: IN_QUEUE, OUT_QUEUE
+    [ ] Integrate ActiveMQ with Tomcat
+          [ ] а) context.xml
+                <Resource name="jms/connectionFactory" auth="Container"
+                          type="org.apache.activemq.ActiveMQConnectionFactory"
+                          factory="org.apache.activemq.jndi.JNDIReferenceFactory"
+                          brokerURL="tcp://localhost:61616" brokerName="MyActiveMqBroker"/>
+                <Resource name="jms/outQueue" auth="Container"
+                          type="org.apache.activemq.command.ActiveMQQueue"
+                          factory="org.apache.activemq.jndi.JNDIReferenceFactory"
+                          physicalName="OUT_QUEUE"/>
+         [ ] b) Put activemq-client-5.14.1.jar to <Tomcat folder>/lib
+    [ ] Implement Flower shop application integration with FlowersGlobal CRM:
+        [ ] а) send xml representation of customer entity to out queue when new customer registers
+    	[ ] b) receive new discount request object (customerId, newDiscount) in XML format to change customers discount

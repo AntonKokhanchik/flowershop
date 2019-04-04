@@ -2,8 +2,8 @@ package flowershop.backend.entity;
 
 import java.util.Objects;
 
-public class User extends Entity{
-
+public class User {
+    private int id;
     private String login;
     private String password;
     private String fullName;
@@ -23,6 +23,7 @@ public class User extends Entity{
         this.password = password;
         this.fullName = fullName;
         this.address = address;
+        this.phone = phone;
         this.balance = balance;
         this.discount = discount;
     }
@@ -32,13 +33,34 @@ public class User extends Entity{
         this.password = user.password;
         this.fullName = user.fullName;
         this.address = user.address;
+        this.phone = user.phone;
         this.balance = user.balance;
         this.discount = user.discount;
     }
 
+    public User(String login, String password, String fullName, String address,
+                String phone){
+        this.login = login;
+        this.password = password;
+        this.fullName = fullName;
+        this.address = address;
+        this.phone = phone;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getLogin() {
         return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getPassword() {

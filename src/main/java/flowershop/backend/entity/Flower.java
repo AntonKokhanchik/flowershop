@@ -2,7 +2,8 @@ package flowershop.backend.entity;
 
 import java.util.Objects;
 
-public class Flower extends Entity{
+public class Flower {
+    private int id;
     private String title;
     private float price;
     private int count;
@@ -17,6 +18,14 @@ public class Flower extends Entity{
         this.title = flower.title;
         this.price = flower.price;
         this.count = flower.count;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {

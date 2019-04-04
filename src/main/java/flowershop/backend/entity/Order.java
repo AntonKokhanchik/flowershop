@@ -5,7 +5,8 @@ import java.util.Objects;
 
 import flowershop.backend.OrderStatus;
 
-public class Order extends Entity{
+public class Order {
+    private int id;
     private int fullPrice;
     private Calendar dateCreation;
     private Calendar dateClosing;
@@ -23,6 +24,14 @@ public class Order extends Entity{
         this.dateCreation = order.dateCreation;
         this.dateClosing = order.dateClosing;
         this.status = order.status;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getFullPrice() {

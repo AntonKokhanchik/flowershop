@@ -2,39 +2,18 @@ package flowershop.backend.services;
 
 import flowershop.backend.entity.User;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-public class UserService implements EntityService <User>{
-
-    @Override
-    public boolean create(User entity) {
-        return false;
-    }
-
-    @Override
-    public boolean update(User entity) {
-        return false;
-    }
-
-    @Override
-    public boolean delete(User entity) {
-        return false;
-    }
-
-    @Override
-    public User find(int id) {
-        return null;
-    }
-
-    @Override
-    public List<User> getAll() {
-        return null;
-    }
-
-    @Override
-    public boolean validate(User entity) {
-        return false;
-    }
-
-    public User getAdmin(){ return null; }
+public interface UserService {
+    boolean create(User user);
+    boolean update(User user);
+    boolean delete(User user);
+    User find(int id);
+    List<User> getAll();
+    boolean validate(User user);
+    User getAdmin();
+    void register(HttpServletRequest req);
+    User verify(HttpServletRequest req);
+    User findByLogin(String login);
 }

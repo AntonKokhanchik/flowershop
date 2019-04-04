@@ -4,13 +4,14 @@
 
 <web-app>
     <display-name>Archetype Created Web Application</display-name>
-    <!--<servlet>-->
-        <!--<servlet-name>hello</servlet-name>-->
-        <!--<servlet-class>flowershop.frontend.servlets.HelloServlet</servlet-class>-->
-    <!--</servlet>-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:/config/application-context.xml</param-value>
+    </context-param>
 
-    <!--<servlet-mapping>-->
-        <!--<servlet-name>hello</servlet-name>-->
-        <!--<url-pattern>/hello</url-pattern>-->
-    <!--</servlet-mapping>-->
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
 </web-app>

@@ -103,35 +103,35 @@ TODO[ ] Module 4 Activity:
     [+] Create business and access services interfaces with needed methods (no implementation required)
 
 TODO[ ] Module 5 Activity:
-    [ ] Introduce spring context to the Flowers shop web application
-    [ ] Create empty implementation classes for business and access services, annotate them as beans
-    [ ] Inject access services beans to dependent business services
-    [ ] Add some System.out to beans constructors to check beans creation during application startup
+    [+] Introduce spring context to the Flowers shop web application
+    [+] Create empty implementation classes for business and access services, annotate them as beans
+    [+] Inject access services beans to dependent business services
+    [+] Add some System.out to beans constructors to check beans creation during application startup
 
 TODO[ ] Module 6 Activity:
     [ ] Add both slf4j dependencies to your project pom
     [ ] Find and add relevant logback dependency from central maven repo (https://mvnrepository.com/)
     [ ] Introduce logging to the Flowers shop web application. Change System.out calls to logging calls
 
-TODO[ ] Module 7 Activity. Part 1:
-    [ ] Create login page with
+[x] Module 7 Activity. Part 1:
+    [x] Create login page with
         Form with login/password inputs
         Login button calling Login servlet with form data
         Register button forwarding to register page
-    [ ] Create register page with
+    [x] Create register page with
         User info inputs(login, name, password, etc.)
         Register button calling Register servlet with form data
-    [ ] Create main page with
+    [x] Create main page with
         Logged user info (name, discount, balance) from session
         Logout button erasing session and forwarding to login page
 
 TODO[ ] Module 7 Activity. Part 2:
-    [ ] Fill User and UserDto classes with user attributes
+    [+] Fill User and UserDto classes with user attributes
         Create login servlet
         Pass data to business service
         If logged successfully, put user into session, redirect to main page
         Else show error
-    [ ] Create register servlet
+    [x] Create register servlet
         Pass data to business service
         Redirect to login page
 

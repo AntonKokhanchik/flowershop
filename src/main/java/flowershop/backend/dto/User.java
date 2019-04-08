@@ -1,16 +1,18 @@
-package flowershop.backend.entity;
+package flowershop.backend.dto;
 
+import flowershop.backend.entity.UserEntity;
+
+import java.math.BigDecimal;
 import java.util.Objects;
 
 public class User {
-    private int id;
     private String login;
     private String password;
     private String fullName;
     private String address;
     private String phone;
-    private float balance;
-    private int discount;
+    private BigDecimal balance;
+    private Integer discount;
 
     private User(String login, String password){
         this.login = login;
@@ -18,7 +20,7 @@ public class User {
     }
 
     public User(String login, String password, String fullName, String address ,
-                String phone, float balance, int discount){
+                String phone, BigDecimal balance, Integer discount){
         this.login = login;
         this.password = password;
         this.fullName = fullName;
@@ -47,12 +49,26 @@ public class User {
         this.phone = phone;
     }
 
-    public int getId() {
-        return id;
+    public User(UserEntity user){
+        this.login = user.getLogin();
+        this.password = user.getPassword();
+        this.fullName = user.getFullName();
+        this.address = user.getAddress();
+        this.phone = user.getPhone();
+        this.balance = user.getBalance();
+        this.discount = user.getDiscount();
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public UserEntity toEntity(){
+        UserEntity entity = new UserEntity();
+        entity.setLogin(login);
+        entity.setPassword(password);
+        entity.setFullName(fullName);
+        entity.setAddress(address);
+        entity.setPhone(phone);
+        entity.setBalance(balance);
+        entity.setDiscount(discount);
+        return entity;
     }
 
     public String getLogin() {
@@ -95,19 +111,19 @@ public class User {
         this.phone = phone;
     }
 
-    public float getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(float balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
-    public int getDiscount() {
+    public Integer getDiscount() {
         return discount;
     }
 
-    public void setDiscount(int discount) {
+    public void setDiscount(Integer discount) {
         this.discount = discount;
     }
 
@@ -116,7 +132,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Float.compare(user.balance, balance) == 0 &&
+        return user.balance.compareTo(balance) == 0 &&
                 discount == user.discount &&
                 login.equals(user.login) &&
                 password.equals(user.password) &&

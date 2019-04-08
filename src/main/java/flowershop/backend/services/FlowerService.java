@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.entity.Flower;
+import flowershop.backend.dto.Flower;
 
 import java.util.List;
 

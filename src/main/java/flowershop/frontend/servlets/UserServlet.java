@@ -1,8 +1,6 @@
 package flowershop.frontend.servlets;
 
-import flowershop.backend.entity.User;
 import flowershop.backend.services.UserService;
-import flowershop.backend.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
@@ -14,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet(urlPatterns = "/user")
 public class UserServlet  extends HttpServlet {
@@ -32,7 +29,7 @@ public class UserServlet  extends HttpServlet {
 
         Object sessionUserId = req.getSession().getAttribute("sessionUserId");
         if (sessionUserId != null)
-            req.setAttribute("sessionUser", userService.find((int) sessionUserId));
+            req.setAttribute("sessionUser", userService.find(sessionUserId.toString()));
 
         req.getRequestDispatcher("user_index.jsp").forward(req, resp);
     }

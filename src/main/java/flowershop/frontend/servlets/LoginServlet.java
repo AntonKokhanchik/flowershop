@@ -1,6 +1,6 @@
 package flowershop.frontend.servlets;
 
-import flowershop.backend.entity.User;
+import flowershop.backend.dto.User;
 import flowershop.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -33,7 +33,7 @@ public class LoginServlet extends HttpServlet {
     protected  void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = userService.verify(req);
 
-        req.getSession().setAttribute("sessionUserId", user.getId());
+        req.getSession().setAttribute("sessionUserId", user.getLogin());
         resp.sendRedirect("/user");
     }
 }

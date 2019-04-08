@@ -1,16 +1,21 @@
 package flowershop.backend.services;
 
-import flowershop.backend.entity.User;
+import flowershop.backend.dto.User;
+import flowershop.backend.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService{
-    private List<User> users = new LinkedList<>();
+    @PersistenceContext
+    private EntityManager em;
 
     @PostConstruct
     public void init(){
@@ -27,47 +32,58 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean create(User user) {
-        user.setId(users.size());
-        user.setBalance(2000);
+    public void create(User user) {
+        validate(user);
+
+        if (em.find(UserService.class, user.getLogin()) != null)
+            throw new IllegalArgumentException("login is already in use");
+
+        user.setBalance(new BigDecimal(2000));
         user.setDiscount(0);
-        if (validate(user)) {
-            users.add(user);
-            return true;
-        }
-        return false;
+
+        em.getTransaction().begin();
+        em.persist(user.toEntity());
+        em.getTransaction().commit();
     }
 
     @Override
-    public boolean update(User user) {
-        return false;
+    public void update(User user) {
+        em.getTransaction().begin();
+        em.merge(user.toEntity());
+        em.getTransaction().commit();
     }
 
     @Override
-    public boolean delete(User user) {
-        return false;
+    public void delete(User user) {
+        em.getTransaction().begin();
+        em.merge(user.toEntity());
+        em.getTransaction().commit();
     }
 
     @Override
-    public User find(int id) {
-        for(User user : users)
-            if (user.getId() == id)
-                return user;
-        return null;
+    public User find(String login) {
+        return new User(em.find(UserEntity.class, login));
     }
 
     @Override
     public List<User> getAll() {
+        List<UserEntity> entities = em.createNamedQuery("getAll", UserEntity.class).getResultList();
+        List<User> users = new LinkedList<>();
+
+        for(UserEntity e : entities)
+            users.add(new User(e));
+
         return users;
     }
 
     @Override
-    public boolean validate(User user) {
-        return true;
+    public void validate(User user) {
     }
 
     @Override
-    public User getAdmin(){ return null; }
+    public User getAdmin(){
+        return new User(em.find(UserEntity.class, "admin"));
+    }
 
     @Override
     public void register(HttpServletRequest req){
@@ -87,18 +103,13 @@ public class UserServiceImpl implements UserService{
         String login = req.getParameter("login");
         String password = req.getParameter("password");
 
-        User user = findByLogin(login);
+        User user = find(login);
+
+        if(user == null)
+            throw new IllegalArgumentException("Wrong login");
 
         if (password.equals(user.getPassword()))
             return user;
-        return null;
-    }
-
-    @Override
-    public User findByLogin(String login) {
-        for (User u : users)
-            if (login.equals(u.getLogin()))
-                return u;
-        return null;
+        throw new IllegalArgumentException("Wrong password");
     }
 }

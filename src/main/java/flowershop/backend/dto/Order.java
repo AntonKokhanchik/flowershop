@@ -1,4 +1,4 @@
-package flowershop.backend.entity;
+package flowershop.backend.dto;
 
 import java.util.Calendar;
 import java.util.Objects;

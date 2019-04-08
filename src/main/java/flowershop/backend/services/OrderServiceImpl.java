@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.entity.Order;
+import flowershop.backend.dto.Order;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;

@@ -2,13 +2,15 @@ package flowershop.backend.services;
 
 import flowershop.backend.dto.Flower;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface FlowerService {
-    boolean create(Flower flower);
-    boolean update(Flower flower);
-    boolean delete(Flower flower);
-    Flower find(int id);
+    void create(Flower flower);
+    void update(Flower flower);
+    void delete(Flower flower);
+    Flower find(Long id);
     List<Flower> getAll();
-    boolean validate(Flower flower);
+    void validate(Flower flower);
+    Flower parse(HttpServletRequest req);
 }

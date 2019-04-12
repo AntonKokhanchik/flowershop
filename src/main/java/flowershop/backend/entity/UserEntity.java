@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name="USERS")
-@NamedQuery(name="getAll", query="Select c from UserEntity c")
+@NamedQuery(name="getAllUsers", query="Select c from UserEntity c")
 public class UserEntity {
     @Id
     private String login;

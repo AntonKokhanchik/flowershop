@@ -3,6 +3,7 @@ package flowershop.backend.services;
 import flowershop.backend.dto.User;
 import flowershop.backend.entity.UserEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -20,44 +21,31 @@ public class UserServiceImpl implements UserService{
     @PostConstruct
     public void init(){
         System.out.println("User service on");
-
-        create(new User("admin", "admin123", "admin", "unknown", "+0(000)000-00-00"));
-        create(new User("login1", "pass1", "Alex1", "anywhere1", "+0(000)000-00-01"));
-        create(new User("login2", "pass2", "Alex2", "anywhere2", "+0(000)000-00-02"));
-        create(new User("login3", "pass3", "Alex3", "anywhere3", "+0(000)000-00-03"));
-        create(new User("login4", "pass4", "Alex4", "anywhere4", "+0(000)000-00-04"));
-        create(new User("login5", "pass5", "Alex5", "anywhere5", "+0(000)000-00-05"));
-        create(new User("login6", "pass6", "Alex6", "anywhere6", "+0(000)000-00-06"));
-        create(new User("login7", "pass7", "Alex7", "anywhere7", "+0(000)000-00-07"));
     }
 
     @Override
-    public void create(User user) {
+    public void create(User user, EntityManager em) {
         validate(user);
 
-        if (em.find(UserService.class, user.getLogin()) != null)
+        if (em.find(UserEntity.class, user.getLogin()) != null)
             throw new IllegalArgumentException("login is already in use");
 
         user.setBalance(new BigDecimal(2000));
         user.setDiscount(0);
 
-        em.getTransaction().begin();
         em.persist(user.toEntity());
-        em.getTransaction().commit();
     }
 
     @Override
+    @Transactional
     public void update(User user) {
-        em.getTransaction().begin();
         em.merge(user.toEntity());
-        em.getTransaction().commit();
     }
 
     @Override
+    @Transactional
     public void delete(User user) {
-        em.getTransaction().begin();
         em.merge(user.toEntity());
-        em.getTransaction().commit();
     }
 
     @Override
@@ -86,6 +74,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void register(HttpServletRequest req){
         User newUser = new User(
                 req.getParameter("login"),
@@ -95,7 +84,7 @@ public class UserServiceImpl implements UserService{
                 req.getParameter("phone")
         );
 
-        create(newUser);
+        create(newUser,em);
     }
 
     @Override

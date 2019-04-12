@@ -5,21 +5,15 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name="USERS")
-@NamedQuery(name="getAll", query="Select c from USERS c")
+@NamedQuery(name="getAll", query="Select c from UserEntity c")
 public class UserEntity {
     @Id
     private String login;
-    @Column
     private String password;
-    @Column
     private String fullName;
-    @Column
     private String address;
-    @Column
     private String phone;
-    @Column
     private BigDecimal balance;
-    @Column
     private Integer discount;
 
     public String getLogin() {

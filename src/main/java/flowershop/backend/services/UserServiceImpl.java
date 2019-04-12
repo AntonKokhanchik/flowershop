@@ -24,7 +24,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void create(User user, EntityManager em) {
+    @Transactional
+    public void create(User user) {
         validate(user);
 
         if (em.find(UserEntity.class, user.getLogin()) != null)
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void delete(User user) {
-        em.merge(user.toEntity());
+        em.remove(em.merge(user.toEntity()));
     }
 
     @Override
@@ -55,7 +56,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public List<User> getAll() {
-        List<UserEntity> entities = em.createNamedQuery("getAll", UserEntity.class).getResultList();
+        List<UserEntity> entities = em.createNamedQuery("getAllUsers", UserEntity.class).getResultList();
         List<User> users = new LinkedList<>();
 
         for(UserEntity e : entities)
@@ -74,17 +75,14 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
-    public void register(HttpServletRequest req){
-        User newUser = new User(
+    public User parse(HttpServletRequest req){
+        return new User(
                 req.getParameter("login"),
                 req.getParameter("password"),
                 req.getParameter("fullname"),
                 req.getParameter("address"),
                 req.getParameter("phone")
         );
-
-        create(newUser,em);
     }
 
     @Override

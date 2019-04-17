@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FlowerServiceImpl implements FlowerService {
@@ -36,6 +37,16 @@ public class FlowerServiceImpl implements FlowerService {
     @Transactional
     public void update(Flower flower) {
         em.merge(flower.toEntity());
+    }
+
+    @Override
+    @Transactional
+    public void updateWithOrder(Cart cart){
+        for (Map.Entry<Flower, Integer> item :cart.items.entrySet()) {
+            Flower f = item.getKey();
+            f.setCount(f.getCount() - item.getValue());
+            em.merge(f.toEntity());
+        }
     }
 
     @Override

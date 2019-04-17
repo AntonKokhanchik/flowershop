@@ -1,14 +1,19 @@
 package flowershop.backend.services;
 
 import flowershop.backend.dto.Order;
+import flowershop.backend.dto.User;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface OrderService {
-    boolean create(Order order);
-    boolean update(Order order);
-    boolean delete(Order order);
-    Order find(int id);
+    void create(Order order);
+    void create(Cart cart, User user);
+    void update(Order order);
+    void delete(Order order);
+    Order find(Long id);
     List<Order> getAll();
-    boolean validate(Order order);
+    List<Order> getByUser(User user);
+    void validate(Order order);
+    Order parse(HttpServletRequest req);
 }

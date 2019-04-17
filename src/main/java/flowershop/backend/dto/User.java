@@ -3,6 +3,7 @@ package flowershop.backend.dto;
 import flowershop.backend.entity.UserEntity;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class User {
     private String login;
@@ -101,6 +102,25 @@ public class User {
     }
 
     public boolean isAdmin(){return login.equals("admin");}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(login, user.login) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(fullName, user.fullName) &&
+                Objects.equals(address, user.address) &&
+                Objects.equals(phone, user.phone) &&
+                Objects.equals(balance, user.balance) &&
+                Objects.equals(discount, user.discount);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(login, password, fullName, address, phone, balance, discount);
+    }
 
     @Override
     public String toString() {

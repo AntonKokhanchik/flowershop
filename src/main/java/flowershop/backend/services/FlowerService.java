@@ -8,6 +8,7 @@ import java.util.List;
 public interface FlowerService {
     void create(Flower flower);
     void update(Flower flower);
+    void updateWithOrder(Cart cart);
     void delete(Flower flower);
     Flower find(Long id);
     List<Flower> getAll();

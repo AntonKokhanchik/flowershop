@@ -2,6 +2,7 @@ package flowershop.backend.entity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name="USERS")
@@ -15,6 +16,8 @@ public class UserEntity {
     private String phone;
     private BigDecimal balance;
     private Integer discount;
+    @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade=CascadeType.ALL)
+    private List<OrderEntity> orders;
 
     public String getLogin() {
         return login;
@@ -70,6 +73,19 @@ public class UserEntity {
 
     public void setDiscount(Integer discount) {
         this.discount = discount;
+    }
+
+    public List<OrderEntity> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<OrderEntity> orders) {
+        this.orders = orders;
+    }
+
+    public  void addOrder(OrderEntity d)   {
+        orders.add(d);
+        d.setOwner(this);
     }
 
     @Override

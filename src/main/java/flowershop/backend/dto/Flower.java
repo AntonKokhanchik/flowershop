@@ -3,6 +3,7 @@ package flowershop.backend.dto;
 import flowershop.backend.entity.FlowerEntity;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class Flower {
     private Long id;
@@ -64,6 +65,22 @@ public class Flower {
         entity.setCount(count);
 
         return entity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Flower flower = (Flower) o;
+        return Objects.equals(id, flower.id) &&
+                Objects.equals(title, flower.title) &&
+                Objects.equals(price, flower.price) &&
+                Objects.equals(count, flower.count);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, price, count);
     }
 
     @Override

@@ -1,60 +1,66 @@
 package flowershop.backend.dto;
 
-import java.util.Calendar;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import flowershop.backend.OrderStatus;
+import flowershop.backend.entity.OrderEntity;
 
 public class Order {
-    private int id;
-    private int fullPrice;
-    private Calendar dateCreation;
-    private Calendar dateClosing;
+    private Long id;
+    private BigDecimal fullPrice;
+    private LocalDateTime dateCreation;
+    private LocalDateTime dateClosing;
     private OrderStatus status;
+    private User owner;
 
-    public Order(int fullPrice, Calendar dateCreation, Calendar dateClosing, OrderStatus status){
+    public Order(Long id, BigDecimal fullPrice, LocalDateTime dateCreation, LocalDateTime dateClosing, OrderStatus status){
+        this.id = id;
         this.fullPrice = fullPrice;
         this.dateCreation = dateCreation;
         this.dateClosing = dateClosing;
         this.status = status;
     }
 
-    public Order(Order order){
-        this.fullPrice = order.fullPrice;
-        this.dateCreation = order.dateCreation;
-        this.dateClosing = order.dateClosing;
-        this.status = order.status;
+    public Order(OrderEntity entity){
+        id = entity.getId();
+        fullPrice = entity.getFullPrice();
+        dateCreation = entity.getDateCreation();
+        dateClosing = entity.getDateClosing();
+        status = entity.getStatus();
+        owner = new User(entity.getOwner());
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public int getFullPrice() {
+    public BigDecimal getFullPrice() {
         return fullPrice;
     }
 
-    public void setFullPrice(int fullPrice) {
+    public void setFullPrice(BigDecimal fullPrice) {
         this.fullPrice = fullPrice;
     }
 
-    public Calendar getDateCreation() {
+    public LocalDateTime getDateCreation() {
         return dateCreation;
     }
 
-    public void setDateCreation(Calendar dateCreation) {
+    public void setDateCreation(LocalDateTime dateCreation) {
         this.dateCreation = dateCreation;
     }
 
-    public Calendar getDateClosing() {
+    public LocalDateTime getDateClosing() {
         return dateClosing;
     }
 
-    public void setDateClosing(Calendar dateClosing) {
+    public void setDateClosing(LocalDateTime dateClosing) {
         this.dateClosing = dateClosing;
     }
 
@@ -66,12 +72,32 @@ public class Order {
         this.status = status;
     }
 
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public OrderEntity toEntity(){
+        OrderEntity entity = new OrderEntity();
+        entity.setId(id);
+        entity.setFullPrice(fullPrice);
+        entity.setDateCreation(dateCreation);
+        entity.setDateClosing(dateClosing);
+        entity.setStatus(status);
+
+        return entity;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return fullPrice == order.fullPrice &&
+        return Objects.equals(id, order.id) &&
+                Objects.equals(fullPrice, order.fullPrice) &&
                 Objects.equals(dateCreation, order.dateCreation) &&
                 Objects.equals(dateClosing, order.dateClosing) &&
                 status == order.status;
@@ -79,13 +105,14 @@ public class Order {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fullPrice, dateCreation, dateClosing, status);
+        return Objects.hash(id, fullPrice, dateCreation, dateClosing, status);
     }
 
     @Override
     public String toString() {
         return "Order{" +
-                "fullPrice=" + fullPrice +
+                "id="+ id +
+                ", fullPrice=" + fullPrice +
                 ", dateCreation=" + dateCreation +
                 ", dateClosing=" + dateClosing +
                 ", status=" + status +

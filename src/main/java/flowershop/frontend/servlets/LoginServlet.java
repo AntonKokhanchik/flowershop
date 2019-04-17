@@ -33,7 +33,7 @@ public class LoginServlet extends HttpServlet {
     protected  void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = userService.verify(req);
 
-        req.getSession().setAttribute("sessionUserId", user.getLogin());
-        resp.sendRedirect("/user");
+        req.getSession().setAttribute("sessionUser", user);
+        resp.sendRedirect("/flower");
     }
 }

@@ -35,20 +35,16 @@ public class FlowerControllerServlet extends HttpServlet {
 
         String page = "";
         switch (action){
-//            case "show":
-//                Long showId = Long.parseLong(path.split("/")[2]);
-//                req.setAttribute("flower", flowerService.find(showId));
-//                req.removeAttribute("id");
-//                page = "/flowerShow.jsp";
-//                break;
             case "new":
                 page = "/flowerNew.jsp";
                 break;
+
             case "update":
                 Long updateId = Long.parseLong(path.split("/")[2]);
                 req.setAttribute("flower", flowerService.find(updateId));
                 page = "/flowerUpdate.jsp";
                 break;
+
             case "index":
                 req.setAttribute("flowers", flowerService.getAll());
                 page = "/flowerIndex.jsp";
@@ -66,9 +62,11 @@ public class FlowerControllerServlet extends HttpServlet {
             case "new":
                 flowerService.create(flowerService.parse(req));
                 break;
+
             case "update":
                 flowerService.update(flowerService.parse(req));
                 break;
+
             case "delete":
                 Long id = Long.parseLong(path.split("/")[2]);
                 flowerService.delete(flowerService.find(id));

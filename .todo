@@ -22,9 +22,9 @@
 название цветка, цена цветка, кол-во на складе. Пользователь может производить поиск цветка по названию,
 либо по диапазону цен. В каталоге пользователь может указать кол-во цветков для заказа (<= кол-ву на складе)
 и добавить их в корзину.
-- Корзина представляет собой таблицу с данными: название цветка, кол-во заказанных цветов, суммарная цена за вид цветка.
-Также должна отображаться общая стоимость заказа в корзине, с учетом скидки. Данные корзины сохраняются в
-сессии пользователя. Корзина отображается также на главной странице пользователя.
+- Корзина представляет собой таблицу с данными: название цветка, кол-во заказанных цветов, суммарная цена за
+вид цветка. Также должна отображаться общая стоимость заказа в корзине, с учетом скидки.
+Данные корзины сохраняются в сессии пользователя. Корзина отображается также на главной странице пользователя.
 При наличии цветов в корзине должна быть доступна кнопка «создать заказ». При создании заказа корзина очищается,
 все данные о заказанных цветах сохраняются в рамках заказа.
 
@@ -125,8 +125,8 @@ TODO[ ] Module 6 Activity:
         Logged user info (name, discount, balance) from session
         Logout button erasing session and forwarding to login page
 
-TODO[ ] Module 7 Activity. Part 2:
-    [+] Fill User and UserDto classes with user attributes
+[x] Module 7 Activity. Part 2:
+    [x] Fill User and UserDto classes with user attributes
         Create login servlet
         Pass data to business service
         If logged successfully, put user into session, redirect to main page
@@ -136,14 +136,14 @@ TODO[ ] Module 7 Activity. Part 2:
         Redirect to login page
 
 TODO[ ] Module 8 Activity:
-    [ ] Create DataSource on tomcat
+    [x] Create DataSource on tomcat
         You will need to put following artifact jars to Tomcat/lib:
         commons-dbcp:commons-dbcp:1.4 (download from maven central)
         com.h2database:1.4.XXX (copy from H2/bin)
-    [ ] Integrate JPA(+Transactions) with Spring and Hibernate
-    [ ] Write DB scripts to create user table, integrate flyway to application
-    [ ] Use DB access layer to implement user login/registration using H2 DB
-    [ ] Implement other application functionality according to application requirements
+    [x] Integrate JPA(+Transactions) with Spring and Hibernate
+    [x] Write DB scripts to create user table, integrate flyway to application
+    [x] Use DB access layer to implement user login/registration using H2 DB
+    [+] Implement other application functionality according to application requirements
 
 TODO[ ] Module 9 Activity:
     [ ] Add maven dependencies:

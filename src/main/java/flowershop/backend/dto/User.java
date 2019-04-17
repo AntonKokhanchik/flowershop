@@ -3,7 +3,6 @@ package flowershop.backend.dto;
 import flowershop.backend.entity.UserEntity;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 public class User {
     private String login;
@@ -13,32 +12,6 @@ public class User {
     private String phone;
     private BigDecimal balance;
     private Integer discount;
-
-    private User(String login, String password){
-        this.login = login;
-        this.password = password;
-    }
-
-    public User(String login, String password, String fullName, String address ,
-                String phone, BigDecimal balance, Integer discount){
-        this.login = login;
-        this.password = password;
-        this.fullName = fullName;
-        this.address = address;
-        this.phone = phone;
-        this.balance = balance;
-        this.discount = discount;
-    }
-
-    public User(User user){
-        this.login = user.login;
-        this.password = user.password;
-        this.fullName = user.fullName;
-        this.address = user.address;
-        this.phone = user.phone;
-        this.balance = user.balance;
-        this.discount = user.discount;
-    }
 
     public User(String login, String password, String fullName, String address,
                 String phone){
@@ -50,13 +23,13 @@ public class User {
     }
 
     public User(UserEntity user){
-        this.login = user.getLogin();
-        this.password = user.getPassword();
-        this.fullName = user.getFullName();
-        this.address = user.getAddress();
-        this.phone = user.getPhone();
-        this.balance = user.getBalance();
-        this.discount = user.getDiscount();
+        login = user.getLogin();
+        password = user.getPassword();
+        fullName = user.getFullName();
+        address = user.getAddress();
+        phone = user.getPhone();
+        balance = user.getBalance();
+        discount = user.getDiscount();
     }
 
     public UserEntity toEntity(){
@@ -127,24 +100,7 @@ public class User {
         this.discount = discount;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return user.balance.compareTo(balance) == 0 &&
-                discount == user.discount &&
-                login.equals(user.login) &&
-                password.equals(user.password) &&
-                Objects.equals(fullName, user.fullName) &&
-                Objects.equals(address, user.address) &&
-                Objects.equals(phone, user.phone);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(login, password, fullName, address, phone, balance, discount);
-    }
+    public boolean isAdmin(){return login.equals("admin");}
 
     @Override
     public String toString() {

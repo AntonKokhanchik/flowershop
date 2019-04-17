@@ -26,19 +26,14 @@ public class UserServlet  extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("users", userService.getAll());
-
-        Object sessionUserId = req.getSession().getAttribute("sessionUserId");
-        if (sessionUserId != null)
-            req.setAttribute("sessionUser", userService.find(sessionUserId.toString()));
-
+        
         req.getRequestDispatcher("user_index.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //tmp logout
-        HttpSession session = req.getSession();
-        session.removeAttribute("sessionUserId");
-        resp.sendRedirect("/user");
+        req.getSession().removeAttribute("sessionUser");
+        resp.sendRedirect(req.getHeader("referer"));
     }
 }

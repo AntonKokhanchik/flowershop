@@ -1,6 +1,7 @@
 package flowershop.frontend.servlets;
 
 import flowershop.backend.services.FlowerService;
+import flowershop.backend.exception.FlowerValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 @WebServlet(urlPatterns = "/flower/*")
 public class FlowerControllerServlet extends HttpServlet {
@@ -33,22 +35,28 @@ public class FlowerControllerServlet extends HttpServlet {
         else
             action = path.split("/")[1];
 
-        String page = "";
+        String page;
         switch (action){
             case "new":
-                page = "/flowerNew.jsp";
+                req.setAttribute("action", action);
+                page = "/flowerForm.jsp";
                 break;
 
             case "update":
+                req.setAttribute("action", action);
                 Long updateId = Long.parseLong(path.split("/")[2]);
                 req.setAttribute("flower", flowerService.find(updateId));
-                page = "/flowerUpdate.jsp";
+                page = "/flowerForm.jsp";
                 break;
 
             case "index":
                 req.setAttribute("flowers", flowerService.getAll());
                 page = "/flowerIndex.jsp";
                 break;
+
+            default:
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
         }
         req.getRequestDispatcher(page).forward(req, resp);
     }
@@ -56,22 +64,62 @@ public class FlowerControllerServlet extends HttpServlet {
     @Override
     protected  void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getPathInfo();
-        String action = path.split("/")[1];
+        String action;
+
+        if (path == null || path.split("/").length < 2)
+            action = "error";
+        else
+            action = path.split("/")[1];
 
         switch (action){
             case "new":
-                flowerService.create(flowerService.parse(req));
-                break;
+            case "update":{
+                try {
+                    if (action == "new")
+                        flowerService.create(flowerService.parse(req));
+                    else
+                        flowerService.update(flowerService.parse(req));
+                } catch (FlowerValidationException e) {
+                    handleValidationError(e, req);
 
-            case "update":
-                flowerService.update(flowerService.parse(req));
+                    req.setAttribute("action", action);
+
+                    req.getRequestDispatcher("/flowerForm.jsp").forward(req, resp);
+                    return;
+                }
                 break;
+            }
 
             case "delete":
                 Long id = Long.parseLong(path.split("/")[2]);
                 flowerService.delete(flowerService.find(id));
                 break;
+
+            case "error":
+            default:
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
         }
         resp.sendRedirect("/flower");
+    }
+
+    private void handleValidationError(FlowerValidationException e, HttpServletRequest req) {
+        String attrName = "anotherErrorMsg";
+        switch (e.getMessage()) {
+            case FlowerValidationException.NEGATIVE_COUNT:
+            case FlowerValidationException.WRONG_COUNT:
+                attrName = "countErrorMsg";
+                break;
+            case FlowerValidationException.NEGATIVE_PRICE:
+            case FlowerValidationException.WRONG_PRICE:
+                attrName = "priceErrorMsg";
+                break;
+        }
+        req.setAttribute(attrName, e.getMessage());
+
+        // Copying parameters to fill the form
+        for (Map.Entry<String, String[]> p : req.getParameterMap().entrySet()) {
+            req.setAttribute(p.getKey(), p.getValue()[0]);
+        }
     }
 }

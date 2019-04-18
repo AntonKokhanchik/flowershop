@@ -2,6 +2,7 @@ package flowershop.backend.services;
 
 import flowershop.backend.dto.User;
 import flowershop.backend.entity.UserEntity;
+import flowershop.backend.exception.UserValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,11 +26,11 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public void create(User user) {
+    public void create(User user) throws UserValidationException {
         validate(user);
 
         if (em.find(UserEntity.class, user.getLogin()) != null)
-            throw new IllegalArgumentException("login is already in use");
+            throw new UserValidationException(UserValidationException.LOGIN_IS_TAKEN);
 
         user.setBalance(new BigDecimal(2000));
         user.setDiscount(0);
@@ -86,17 +87,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User verify(HttpServletRequest req) {
+    public User verify(HttpServletRequest req) throws UserValidationException {
         String login = req.getParameter("login");
         String password = req.getParameter("password");
 
-        User user = find(login);
+        UserEntity user = em.find(UserEntity.class, login);
 
         if(user == null)
-            throw new IllegalArgumentException("Wrong login");
+            throw new UserValidationException(UserValidationException.WRONG_LOGIN);
 
         if (password.equals(user.getPassword()))
-            return user;
-        throw new IllegalArgumentException("Wrong password");
+            return new User(user);
+        throw new UserValidationException(UserValidationException.WRONG_PASSWORD);
     }
 }

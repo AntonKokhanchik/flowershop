@@ -2,6 +2,7 @@ package flowershop.backend.services;
 
 import flowershop.backend.dto.Flower;
 import flowershop.backend.entity.FlowerEntity;
+import flowershop.backend.exception.FlowerValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class FlowerServiceImpl implements FlowerService {
@@ -27,26 +27,16 @@ public class FlowerServiceImpl implements FlowerService {
 
     @Override
     @Transactional
-    public void create(Flower flower) {
+    public void create(Flower flower) throws FlowerValidationException {
         validate(flower);
-
         em.persist(flower.toEntity());
     }
 
     @Override
     @Transactional
-    public void update(Flower flower) {
+    public void update(Flower flower) throws FlowerValidationException {
+        validate(flower);
         em.merge(flower.toEntity());
-    }
-
-    @Override
-    @Transactional
-    public void updateWithOrder(Cart cart){
-        for (Map.Entry<Flower, Integer> item :cart.items.entrySet()) {
-            Flower f = item.getKey();
-            f.setCount(f.getCount() - item.getValue());
-            em.merge(f.toEntity());
-        }
     }
 
     @Override
@@ -72,19 +62,46 @@ public class FlowerServiceImpl implements FlowerService {
     }
 
     @Override
-    public void validate(Flower flower) {
+    public void validate(Flower flower) throws FlowerValidationException {
+        if (flower.getTitle() == null)
+            flower.setTitle("Unnamed");
+
+        if (flower.getPrice() == null)
+            flower.setPrice(new BigDecimal(0));
+
+        if (flower.getCount() == null)
+            flower.setCount(0);
+
+        if (flower.getCount() < 0)
+            throw new FlowerValidationException(FlowerValidationException.NEGATIVE_COUNT);
+
+        if (flower.getPrice().compareTo(BigDecimal.ZERO) == -1)
+            throw new FlowerValidationException(FlowerValidationException.NEGATIVE_PRICE);
     }
 
     @Override
-    public Flower parse(HttpServletRequest req){
-        String sid = req.getParameter("id");
-        Long id = sid == null ? null : Long.parseLong(sid);
+    public Flower parse(HttpServletRequest req) throws FlowerValidationException {
+        String parameter = req.getParameter("id");
+        Long id = (parameter == null || parameter == "") ? null : Long.parseLong(parameter);
 
-        return new Flower(
-                id,
-                req.getParameter("title"),
-                new BigDecimal(req.getParameter("price")),
-                Integer.parseInt(req.getParameter("count"))
-                );
+        BigDecimal price;
+        try {
+            price = new BigDecimal(req.getParameter("price"));
+        } catch (NumberFormatException e){
+            throw new FlowerValidationException(FlowerValidationException.WRONG_PRICE);
+        }
+
+        parameter = req.getParameter("count");
+        if (parameter == "")
+            parameter = "0";
+
+        Integer count;
+        try {
+            count = Integer.parseInt(req.getParameter("count"));
+        } catch (NumberFormatException e){
+            throw new FlowerValidationException(FlowerValidationException.WRONG_COUNT);
+        }
+
+        return new Flower(id, req.getParameter("title"), price, count);
     }
 }

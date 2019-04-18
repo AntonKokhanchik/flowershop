@@ -1,10 +1,12 @@
 package flowershop.backend.services;
 
 import flowershop.backend.OrderStatus;
+import flowershop.backend.dto.Flower;
 import flowershop.backend.dto.Order;
 import flowershop.backend.dto.User;
 import flowershop.backend.entity.OrderEntity;
 import flowershop.backend.entity.UserEntity;
+import flowershop.backend.exception.FlowerValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -39,13 +42,27 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void create(Cart cart, User user) {
+    public void create(Cart cart, User user) throws FlowerValidationException {
+        // decrease flowers count
+        // TODO: здесь надо продумать изменение количества цветов между созданием корзины и созданием заказа
+        for (Map.Entry<Flower, Integer> item : cart.items.entrySet()) {
+            Flower flower = item.getKey();
+            flower.setCount(flower.getCount() - item.getValue());
+            if (flower.getCount() < 0)
+                throw new FlowerValidationException(FlowerValidationException.NOT_ENOUGH_FLOWERS);
+
+            em.merge(flower.toEntity());
+        }
+
+        // create order
         OrderEntity order = new Order(null, cart.getResult(user.getDiscount()),
                 LocalDateTime.now(), null, OrderStatus.CREATED).toEntity();
 
+        // set owner
         UserEntity userEntity = em.find(UserEntity.class, user.getLogin());
         order.setOwner(userEntity);
 
+        // save
         em.persist(order);
     }
 

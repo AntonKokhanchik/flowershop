@@ -38,6 +38,11 @@
                 <form action="/order/new/" method="post">
                     <input class="btn btn-success" type="submit" value="Create order" />
                 </form>
+                <c:if test="${cartErrorMsg != null}">
+                    <div class="alert alert-danger" role="alert">
+                        ${cartErrorMsg}
+                    </div>
+                </c:if>
             </c:when>
             <c:otherwise>
                 You must log in before create order

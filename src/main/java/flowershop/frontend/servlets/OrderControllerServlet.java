@@ -3,6 +3,7 @@ package flowershop.frontend.servlets;
 import flowershop.backend.dto.User;
 import flowershop.backend.services.Cart;
 import flowershop.backend.services.FlowerService;
+import flowershop.backend.exception.FlowerValidationException;
 import flowershop.backend.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -38,7 +39,7 @@ public class OrderControllerServlet extends HttpServlet {
         else
             action = path.split("/")[1];
 
-        String page = "";
+        String page;
         switch (action){
             case "index":
                 User user = (User)req.getSession().getAttribute("sessionUser");
@@ -51,6 +52,10 @@ public class OrderControllerServlet extends HttpServlet {
 
                 page = "/orderIndex.jsp";
                 break;
+
+            default:
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
         }
         req.getRequestDispatcher(page).forward(req, resp);
     }
@@ -58,19 +63,28 @@ public class OrderControllerServlet extends HttpServlet {
     @Override
     protected  void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getPathInfo();
-        String action = path.split("/")[1];
+        String action;
+
+        if (path == null || path.split("/").length < 2)
+            action = "error";
+        else
+            action = path.split("/")[1];
 
         switch (action){
             case "new": {
                 Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
 
-                orderService.create(cart, (User) req.getSession().getAttribute("sessionUser"));
-                flowerService.updateWithOrder(cart);
+                try {
+                    orderService.create(cart, (User) req.getSession().getAttribute("sessionUser"));
+                }catch(FlowerValidationException e) {
+                    req.getSession().setAttribute("cartErrorMsg", e.getMessage());
 
+                }
                 cart.clear();
                 req.getSession().setAttribute("sessionCart", cart);
 
-                break;
+                resp.sendRedirect("/order");
+                return;
             }
 
             case "add_to_cart": {
@@ -82,12 +96,12 @@ public class OrderControllerServlet extends HttpServlet {
                 cart.addItem(flowerService.find(flowerId));
 
                 req.getSession().setAttribute("sessionCart", cart);
+
                 resp.sendRedirect("/flower");
                 return;
             }
 
             case "remove_from_cart": {
-                System.out.println("here");
                 Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
                 Long flowerId = Long.parseLong(path.split("/")[2]);
 
@@ -98,15 +112,16 @@ public class OrderControllerServlet extends HttpServlet {
                 return;
             }
 
-            case "update":
-                orderService.update(orderService.parse(req));
-                break;
-
             case "delete":
                 Long id = Long.parseLong(path.split("/")[2]);
-                orderService.delete(orderService.find(id));
-                break;
+                resp.sendRedirect("/order");
+                return;
+
+            case "error":
+            default:
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
         }
-        resp.sendRedirect("/order");
+
     }
 }

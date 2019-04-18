@@ -41,13 +41,20 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void update(User user) {
-        em.merge(user.toEntity());
+        UserEntity userEntity = em.find(UserEntity.class, user.getLogin());
+
+        userEntity.setPassword(user.getPassword());
+        userEntity.setFullName(user.getFullName());
+        userEntity.setAddress(user.getAddress());
+        userEntity.setPhone(user.getPhone());
+        userEntity.setDiscount(user.getDiscount());
+        userEntity.setBalance(user.getBalance());
     }
 
     @Override
     @Transactional
     public void delete(User user) {
-        em.remove(em.merge(user.toEntity()));
+        em.remove(em.find(UserEntity.class, user.getLogin()));
     }
 
     @Override

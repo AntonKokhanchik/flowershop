@@ -83,9 +83,14 @@ public class UserEntity {
         this.orders = orders;
     }
 
-    public  void addOrder(OrderEntity d)   {
+    public void addOrder(OrderEntity d) {
         orders.add(d);
         d.setOwner(this);
+    }
+
+    public void removeOrder(OrderEntity d) {
+        d.setOwner(null);
+        orders.remove(d);
     }
 
     @Override

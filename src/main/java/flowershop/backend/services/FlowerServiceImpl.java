@@ -42,7 +42,7 @@ public class FlowerServiceImpl implements FlowerService {
     @Override
     @Transactional
     public void delete(Flower flower) {
-        em.remove(em.merge(flower.toEntity()));
+        em.remove(em.find(FlowerEntity.class, flower.getId()));
     }
 
     @Override

@@ -68,14 +68,28 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void update(Order order) {
-        em.merge(order.toEntity());
+    public void pay(Order order){
+        OrderEntity orderEntity = em.find(OrderEntity.class, order.getId());
+        UserEntity owner = orderEntity.getOwner();
+
+        owner.setBalance(owner.getBalance().subtract(orderEntity.getFullPrice()));
+
+        orderEntity.setStatus(OrderStatus.PAID);
+    }
+
+    @Override
+    @Transactional
+    public void close(Order order){
+        OrderEntity orderEntity = em.find(OrderEntity.class, order.getId());
+
+        orderEntity.setStatus(OrderStatus.CLOSED);
+        orderEntity.setDateClosing(LocalDateTime.now());
     }
 
     @Override
     @Transactional
     public void delete(Order order) {
-        em.remove(em.merge(order.toEntity()));
+        em.remove(em.find(OrderEntity.class, order.getId()));
     }
 
     @Override

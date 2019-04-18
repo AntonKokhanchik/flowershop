@@ -116,6 +116,7 @@ public class Order {
                 ", dateCreation=" + dateCreation +
                 ", dateClosing=" + dateClosing +
                 ", status=" + status +
+                ", owner=" + owner +
                 '}';
     }
 }

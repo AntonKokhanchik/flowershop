@@ -34,15 +34,21 @@
                                     <td>${o.owner.login}</td>
                                 </c:if>
                                 <td>
-                                    <form action="/order/pay/${o.id}" method="post">
-                                        <input class="btn btn-success" type="submit" value="Pay" />
-                                    </form>
+                                    <c:if test="${o.status == 'CREATED' && sessionUser.login == o.owner.login}">
+                                        <form action="/order/pay/${o.id}" method="post">
+                                            <input class="btn btn-success"
+                                                ${sessionUser.balance < o.fullPrice ? "disabled title='Not enough money'" : "" }
+                                                type="submit" value="Pay" />
+                                        </form>
+                                    </c:if>
                                 </td>
                                 <c:if test="${sessionUser.isAdmin()}">
                                     <td>
-                                        <form action="/order/close/${o.id}" method="post">
-                                            <input class="btn btn-warning" type="submit" value="Close" />
-                                        </form>
+                                        <c:if test="${o.status == 'PAID'}">
+                                            <form action="/order/close/${o.id}" method="post">
+                                                <input class="btn btn-warning" type="submit" value="Close" />
+                                            </form>
+                                        </c:if>
                                     </td>
                                     <td>
                                         <form action="/order/delete/${o.id}" method="post">

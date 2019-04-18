@@ -1,10 +1,12 @@
 package flowershop.frontend.servlets;
 
+import flowershop.backend.dto.Order;
 import flowershop.backend.dto.User;
 import flowershop.backend.services.Cart;
 import flowershop.backend.services.FlowerService;
 import flowershop.backend.exception.FlowerValidationException;
 import flowershop.backend.services.OrderService;
+import flowershop.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
@@ -22,6 +24,8 @@ public class OrderControllerServlet extends HttpServlet {
     private OrderService orderService;
     @Autowired
     private FlowerService flowerService;
+    @Autowired
+    private UserService userService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -112,8 +116,32 @@ public class OrderControllerServlet extends HttpServlet {
                 return;
             }
 
+            case "pay": {
+                User user = (User) req.getSession().getAttribute("sessionUser");
+                Order order = orderService.find(Long.parseLong(path.split("/")[2]));
+
+                if (user.getLogin().equals(order.getOwner().getLogin()))
+                    if (user.getBalance().compareTo(order.getFullPrice()) >= 0) {
+                        orderService.pay(order);
+                        req.getSession().setAttribute("sessionUser", userService.find(user.getLogin()));
+                    }
+
+                resp.sendRedirect("/order");
+                return;
+            }
+
+            case "close": {
+                User user = (User) req.getSession().getAttribute("sessionUser");
+                Order order = orderService.find(Long.parseLong(path.split("/")[2]));
+                if (user.isAdmin())
+                    orderService.close(order);
+                resp.sendRedirect("/order");
+                return;
+            }
+
             case "delete":
                 Long id = Long.parseLong(path.split("/")[2]);
+                orderService.delete(orderService.find(id));
                 resp.sendRedirect("/order");
                 return;
 

@@ -28,25 +28,30 @@
             <a class="navbar-brand" href="/flower">Flowershop</a>
             <ul class="nav nav-pills">
                 <li class="nav-item">
-                    <a class="nav-link" href="/user">Users list</a>
+                    <a class="nav-link" href="/flower">Flowers list</a>
                 </li>
+                <c:if test="${sessionUser.isAdmin()}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user">Users list</a>
+                    </li>
+                </c:if>
                 <li class="nav-item">
                     <a class="nav-link" href="/order">Orders list</a>
                 </li>
                 <c:choose>
                     <c:when test="${sessionUser != null}">
                         <li class="nav-item">
-                            <form method="post" action="/user">
+                            <form method="post" action="/user/logout">
                                 <input type="submit" class="btn btn-warning" value="Logout" />
                             </form>
                         </li>
                     </c:when>
                     <c:otherwise>
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">Log in</a>
+                            <a class="nav-link" href="/user/login">Log in</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/register">Register</a>
+                            <a class="nav-link" href="/user/register">Register</a>
                         </li>
                     </c:otherwise>
                 </c:choose>

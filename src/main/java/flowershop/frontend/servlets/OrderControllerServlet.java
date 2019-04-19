@@ -58,7 +58,7 @@ public class OrderControllerServlet extends HttpServlet {
                 break;
 
             default:
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
         req.getRequestDispatcher(page).forward(req, resp);
@@ -82,7 +82,6 @@ public class OrderControllerServlet extends HttpServlet {
                     orderService.create(cart, (User) req.getSession().getAttribute("sessionUser"));
                 }catch(FlowerValidationException e) {
                     req.getSession().setAttribute("cartErrorMsg", e.getMessage());
-
                 }
                 cart.clear();
                 req.getSession().setAttribute("sessionCart", cart);
@@ -131,23 +130,30 @@ public class OrderControllerServlet extends HttpServlet {
             }
 
             case "close": {
-                User user = (User) req.getSession().getAttribute("sessionUser");
-                Order order = orderService.find(Long.parseLong(path.split("/")[2]));
-                if (user.isAdmin())
+                if (userService.isAccessGranted(req)) {
+                    Order order = orderService.find(Long.parseLong(path.split("/")[2]));
                     orderService.close(order);
-                resp.sendRedirect("/order");
+
+                    resp.sendRedirect("/order");
+                    return;
+                }
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 
             case "delete":
-                Long id = Long.parseLong(path.split("/")[2]);
-                orderService.delete(orderService.find(id));
-                resp.sendRedirect("/order");
+                if (userService.isAccessGranted(req)) {
+                    Long id = Long.parseLong(path.split("/")[2]);
+                    orderService.delete(orderService.find(id));
+                    resp.sendRedirect("/order");
+                    return;
+                }
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
 
             case "error":
             default:
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
 

@@ -2,6 +2,7 @@ package flowershop.frontend.servlets;
 
 import flowershop.backend.services.FlowerService;
 import flowershop.backend.exception.FlowerValidationException;
+import flowershop.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
@@ -18,6 +19,9 @@ import java.util.Map;
 public class FlowerControllerServlet extends HttpServlet {
     @Autowired
     private FlowerService flowerService;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -38,16 +42,24 @@ public class FlowerControllerServlet extends HttpServlet {
         String page;
         switch (action){
             case "new":
-                req.setAttribute("action", action);
-                page = "/flowerForm.jsp";
-                break;
+                if (userService.isAccessGranted(req)) {
+                    req.setAttribute("action", action);
+                    page = "/flowerForm.jsp";
+                    break;
+                }
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
 
             case "update":
-                req.setAttribute("action", action);
-                Long updateId = Long.parseLong(path.split("/")[2]);
-                req.setAttribute("flower", flowerService.find(updateId));
-                page = "/flowerForm.jsp";
-                break;
+                if (userService.isAccessGranted(req)) {
+                    req.setAttribute("action", action);
+                    Long id = Long.parseLong(path.split("/")[2]);
+                    req.setAttribute("flower", flowerService.find(id));
+                    page = "/flowerForm.jsp";
+                    break;
+                }
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
 
             case "index":
                 req.setAttribute("flowers", flowerService.getAll());
@@ -55,7 +67,7 @@ public class FlowerControllerServlet extends HttpServlet {
                 break;
 
             default:
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
         req.getRequestDispatcher(page).forward(req, resp);
@@ -73,31 +85,38 @@ public class FlowerControllerServlet extends HttpServlet {
 
         switch (action){
             case "new":
-            case "update":{
-                try {
-                    if (action == "new")
-                        flowerService.create(flowerService.parse(req));
-                    else
-                        flowerService.update(flowerService.parse(req));
-                } catch (FlowerValidationException e) {
-                    handleValidationError(e, req);
+            case "update":
+                if (userService.isAccessGranted(req)) {
+                    try {
+                        if (action == "new")
+                            flowerService.create(flowerService.parse(req));
+                        else
+                            flowerService.update(flowerService.parse(req));
+                    } catch (FlowerValidationException e) {
+                        handleValidationError(e, req);
 
-                    req.setAttribute("action", action);
+                        req.setAttribute("action", action);
 
-                    req.getRequestDispatcher("/flowerForm.jsp").forward(req, resp);
-                    return;
+                        req.getRequestDispatcher("/flowerForm.jsp").forward(req, resp);
+                        return;
+                    }
+                    break;
                 }
-                break;
-            }
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
 
             case "delete":
-                Long id = Long.parseLong(path.split("/")[2]);
-                flowerService.delete(flowerService.find(id));
-                break;
+                if (userService.isAccessGranted(req)) {
+                    Long id = Long.parseLong(path.split("/")[2]);
+                    flowerService.delete(flowerService.find(id));
+                    break;
+                }
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
 
             case "error":
             default:
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
         resp.sendRedirect("/flower");

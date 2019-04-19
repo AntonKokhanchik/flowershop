@@ -107,4 +107,12 @@ public class UserServiceImpl implements UserService{
             return new User(user);
         throw new UserValidationException(UserValidationException.WRONG_PASSWORD);
     }
+
+    @Override
+    public boolean isAccessGranted(HttpServletRequest req) {
+        User user = (User) req.getSession().getAttribute("sessionUser");
+        if (user != null && user.isAdmin())
+            return true;
+        return false;
+    }
 }

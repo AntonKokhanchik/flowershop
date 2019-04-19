@@ -16,4 +16,5 @@ public interface UserService {
     User getAdmin();
     User parse(HttpServletRequest req);
     User verify(HttpServletRequest req) throws UserValidationException;
+    boolean isAccessGranted(HttpServletRequest req);
 }

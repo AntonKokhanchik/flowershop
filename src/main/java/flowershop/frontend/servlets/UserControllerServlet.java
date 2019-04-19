@@ -40,9 +40,13 @@ public class UserControllerServlet extends HttpServlet {
 
         switch (action){
             case "index":
-                req.setAttribute("users", userService.getAll());
-                page = "/userIndex.jsp";
-                break;
+                if (userService.isAccessGranted(req)) {
+                    req.setAttribute("users", userService.getAll());
+                    page = "/userIndex.jsp";
+                    break;
+                }
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
 
             case "login":
                 page = "/login.jsp";
@@ -53,7 +57,7 @@ public class UserControllerServlet extends HttpServlet {
                 break;
 
             default:
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
 
@@ -106,7 +110,7 @@ public class UserControllerServlet extends HttpServlet {
 
             case "error":
             default:
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
     }

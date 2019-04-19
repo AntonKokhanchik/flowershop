@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import flowershop.backend.OrderStatus;
+import flowershop.backend.enums.OrderStatus;
 import flowershop.backend.entity.OrderEntity;
 
 public class Order {

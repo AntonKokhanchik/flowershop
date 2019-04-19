@@ -1,6 +1,6 @@
 package flowershop.backend.entity;
 
-import flowershop.backend.OrderStatus;
+import flowershop.backend.enums.OrderStatus;
 
 import javax.persistence.*;
 import java.math.BigDecimal;

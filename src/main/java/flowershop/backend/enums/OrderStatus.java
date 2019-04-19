@@ -1,4 +1,4 @@
-package flowershop.backend;
+package flowershop.backend.enums;
 
 public enum OrderStatus {
     CREATED,

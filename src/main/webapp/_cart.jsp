@@ -22,7 +22,7 @@
                         <td>${item.value}</td>
                         <td>${item.value * item.key.price}</td>
                         <td>
-                            <form action="/order/remove_from_cart/${item.key.id}" method="post">
+                            <form action="${path.REMOVE_FROM_CART}/${item.key.id}" method="post">
                                 <input class="btn btn-light btn-sm" type="submit" value=" - " />
                             </form>
                         </td>
@@ -35,7 +35,7 @@
         <br/>
         <c:choose>
             <c:when test="${sessionUser != null}">
-                <form action="/order/new/" method="post">
+                <form action="${path.ORDER_NEW}" method="post">
                     <input class="btn btn-success" type="submit" value="Create order" />
                 </form>
                 <c:if test="${cartErrorMsg != null}">

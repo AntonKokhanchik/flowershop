@@ -25,33 +25,33 @@
     </head>
     <body>
         <nav id="navbar" class="navbar navbar-light bg-light">
-            <a class="navbar-brand" href="/flower">Flowershop</a>
+            <a class="navbar-brand" href="${path.FLOWER_INDEX}">Flowershop</a>
             <ul class="nav nav-pills">
                 <li class="nav-item">
-                    <a class="nav-link" href="/flower">Flowers list</a>
+                    <a class="nav-link" href="${path.FLOWER_INDEX}">Flowers list</a>
                 </li>
                 <c:if test="${sessionUser.isAdmin()}">
                     <li class="nav-item">
-                        <a class="nav-link" href="/user">Users list</a>
+                        <a class="nav-link" href="${path.USER_INDEX}">Users list</a>
                     </li>
                 </c:if>
                 <li class="nav-item">
-                    <a class="nav-link" href="/order">Orders list</a>
+                    <a class="nav-link" href="${path.ORDER_INDEX}">Orders list</a>
                 </li>
                 <c:choose>
                     <c:when test="${sessionUser != null}">
                         <li class="nav-item">
-                            <form method="post" action="/user/logout">
+                            <form method="post" action="${path.LOGOUT}">
                                 <input type="submit" class="btn btn-warning" value="Logout" />
                             </form>
                         </li>
                     </c:when>
                     <c:otherwise>
                         <li class="nav-item">
-                            <a class="nav-link" href="/user/login">Log in</a>
+                            <a class="nav-link" href="${path.LOGIN}">Log in</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/user/register">Register</a>
+                            <a class="nav-link" href="${path.REGISTER}">Register</a>
                         </li>
                     </c:otherwise>
                 </c:choose>

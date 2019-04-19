@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.OrderStatus;
+import flowershop.backend.enums.OrderStatus;
 import flowershop.backend.dto.Flower;
 import flowershop.backend.dto.Order;
 import flowershop.backend.dto.User;

@@ -10,7 +10,7 @@
 
         <div class="col-5">
             <h1> Flower </h1>
-            <form action="/flower/${action}" method="post">
+            <form action="${action}" method="post">
                 <input type="hidden" id="id" name="id" value="${id == null ? flower.id : id}" />
 
                 <div class="form-group">

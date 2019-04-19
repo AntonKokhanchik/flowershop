@@ -35,7 +35,7 @@
                                 </c:if>
                                 <td>
                                     <c:if test="${o.status == 'CREATED' && sessionUser.login == o.owner.login}">
-                                        <form action="/order/pay/${o.id}" method="post">
+                                        <form action="${path.ORDER_PAY}/${o.id}" method="post">
                                             <input class="btn btn-success"
                                                 ${sessionUser.balance < o.fullPrice ? "disabled title='Not enough money'" : "" }
                                                 type="submit" value="Pay" />
@@ -45,13 +45,13 @@
                                 <c:if test="${sessionUser.isAdmin()}">
                                     <td>
                                         <c:if test="${o.status == 'PAID'}">
-                                            <form action="/order/close/${o.id}" method="post">
+                                            <form action="${path.ORDER_CLOSE}/${o.id}" method="post">
                                                 <input class="btn btn-warning" type="submit" value="Close" />
                                             </form>
                                         </c:if>
                                     </td>
                                     <td>
-                                        <form action="/order/delete/${o.id}" method="post">
+                                        <form action="${path.ORDER_DELETE}/${o.id}" method="post">
                                             <input class="btn btn-danger" type="submit" value="Delete" />
                                         </form>
                                     </td>

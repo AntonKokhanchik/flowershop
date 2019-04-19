@@ -1,6 +1,7 @@
 package flowershop.frontend.servlets;
 
 import flowershop.backend.dto.User;
+import flowershop.backend.enums.Path;
 import flowershop.backend.services.UserService;
 import flowershop.backend.exception.UserValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,36 +25,30 @@ public class UserControllerServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+
+        config.getServletContext().setAttribute("path", Path.getPathMap());
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String path = req.getPathInfo();
-        String action;
+        Path path = Path.get(req.getRequestURI());
 
-        if (path == null || path.split("/").length < 2)
-            action = "index";
-        else
-            action = path.split("/")[1];
+        if (path == null){
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
+            return;
+        }
 
-        String page;
-
-        switch (action){
-            case "index":
+        switch (path){
+            case USER_INDEX:
                 if (userService.isAccessGranted(req)) {
                     req.setAttribute("users", userService.getAll());
-                    page = "/userIndex.jsp";
                     break;
                 }
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
 
-            case "login":
-                page = "/login.jsp";
-                break;
-
-            case "register":
-                page = "/register.jsp";
+            case LOGIN:
+            case REGISTER:
                 break;
 
             default:
@@ -61,54 +56,52 @@ public class UserControllerServlet extends HttpServlet {
                 return;
         }
 
-        req.getRequestDispatcher(page).forward(req, resp);
+        req.getRequestDispatcher(path.getPage()).forward(req, resp);
     }
 
     @Override
     protected  void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String path = req.getPathInfo();
-        String action;
+        Path path = Path.get(req.getRequestURI());
 
-        if (path == null || path.split("/").length < 2)
-            action = "error";
-        else
-            action = path.split("/")[1];
+        if (path == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
+            return;
+        }
 
-        switch (action){
-            case "logout":
+        switch (path){
+            case LOGOUT:
                 req.getSession().removeAttribute("sessionUser");
                 resp.sendRedirect(req.getHeader("referer"));
                 return;
 
-            case "register":
+            case REGISTER:
                 try {
                     userService.create(userService.parse(req));
                 } catch (UserValidationException e){
                     handleValidationError(e, req);
 
-                    req.getRequestDispatcher("/register.jsp").forward(req, resp);
+                    req.getRequestDispatcher(path.getPage()).forward(req, resp);
                     return;
                 }
 
-                resp.sendRedirect("/user/login");
+                resp.sendRedirect(Path.LOGIN.getPath());
                 return;
 
-            case "login":
+            case LOGIN:
                 User user;
                 try {
                     user = userService.verify(req);
                 }catch(UserValidationException e){
                     handleValidationError(e, req);
 
-                    req.getRequestDispatcher("/login.jsp").forward(req, resp);
+                    req.getRequestDispatcher(path.getPage()).forward(req, resp);
                     return;
                 }
 
                 req.getSession().setAttribute("sessionUser", user);
-                resp.sendRedirect("/flower");
+                resp.sendRedirect(Path.FLOWER_INDEX.getPath());
                 return;
 
-            case "error":
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;

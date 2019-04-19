@@ -24,16 +24,16 @@
                         <td>${f.price}</td>
                         <td>${f.count}</td>
                         <td>
-                            <form action="/order/add_to_cart/${f.id}" method="post">
+                            <form action="${path.ADD_TO_CART}/${f.id}" method="post">
                                 <input class="btn btn-success" type="submit" value="Add to cart" />
                             </form>
                         </td>
                         <c:if test="${sessionUser.isAdmin()}">
                             <td>
-                                <a class="btn btn-warning" href="/flower/update/${f.id}"> Update </a>
+                                <a class="btn btn-warning" href="${path.FLOWER_UPDATE}/${f.id}"> Update </a>
                             </td>
                             <td>
-                                <form action="/flower/delete/${f.id}" method="post">
+                                <form action="${path.FLOWER_DELETE}/${f.id}" method="post">
                                     <input class="btn btn-danger" type="submit" value="Delete" />
                                 </form>
                             </td>
@@ -43,7 +43,7 @@
             </tbody>
         </table>
         <c:if test="${sessionUser.isAdmin()}">
-            <a class="btn btn-primary" href="/flower/new">Add flower</a>
+            <a class="btn btn-primary" href="${path.FLOWER_NEW}">Add flower</a>
         </c:if>
 
 

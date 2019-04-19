@@ -2,6 +2,7 @@ package flowershop.frontend.servlets;
 
 import flowershop.backend.dto.Order;
 import flowershop.backend.dto.User;
+import flowershop.backend.enums.Path;
 import flowershop.backend.services.Cart;
 import flowershop.backend.services.FlowerService;
 import flowershop.backend.exception.FlowerValidationException;
@@ -31,21 +32,21 @@ public class OrderControllerServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+
+        config.getServletContext().setAttribute("path", Path.getPathMap());
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String path = req.getPathInfo();
-        String action;
+        Path path = Path.get(req.getRequestURI());
 
-        if (path == null || path.split("/").length < 2)
-            action = "index";
-        else
-            action = path.split("/")[1];
+        if (path == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
+            return;
+        }
 
-        String page;
-        switch (action){
-            case "index":
+        switch (path){
+            case ORDER_INDEX:
                 User user = (User)req.getSession().getAttribute("sessionUser");
 
                 if (user != null)
@@ -54,28 +55,26 @@ public class OrderControllerServlet extends HttpServlet {
                     else
                         req.setAttribute("orders", orderService.getByUser(user));
 
-                page = "/orderIndex.jsp";
                 break;
 
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
-        req.getRequestDispatcher(page).forward(req, resp);
+        req.getRequestDispatcher(path.getPage()).forward(req, resp);
     }
 
     @Override
     protected  void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String path = req.getPathInfo();
-        String action;
+        Path path = Path.get(req.getRequestURI());
 
-        if (path == null || path.split("/").length < 2)
-            action = "error";
-        else
-            action = path.split("/")[1];
+        if (path == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
+            return;
+        }
 
-        switch (action){
-            case "new": {
+        switch (path){
+            case ORDER_NEW: {
                 Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
 
                 try {
@@ -86,38 +85,38 @@ public class OrderControllerServlet extends HttpServlet {
                 cart.clear();
                 req.getSession().setAttribute("sessionCart", cart);
 
-                resp.sendRedirect("/order");
+                resp.sendRedirect(Path.ORDER_INDEX.getPath());
                 return;
             }
 
-            case "add_to_cart": {
+            case ADD_TO_CART: {
                 Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
                 if (cart == null)
                     cart = new Cart();
-                Long flowerId = Long.parseLong(path.split("/")[2]);
+                Long flowerId = getId(req);
 
                 cart.addItem(flowerService.find(flowerId));
 
                 req.getSession().setAttribute("sessionCart", cart);
 
-                resp.sendRedirect("/flower");
+                resp.sendRedirect(Path.FLOWER_INDEX.getPath());
                 return;
             }
 
-            case "remove_from_cart": {
+            case REMOVE_FROM_CART: {
                 Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
-                Long flowerId = Long.parseLong(path.split("/")[2]);
+                Long id = getId(req);
 
-                cart.removeItem(flowerService.find(flowerId));
+                cart.removeItem(flowerService.find(id));
 
                 req.getSession().setAttribute("sessionCart", cart);
-                resp.sendRedirect("/flower");
+                resp.sendRedirect(Path.FLOWER_INDEX.getPath());
                 return;
             }
 
-            case "pay": {
+            case ORDER_PAY: {
                 User user = (User) req.getSession().getAttribute("sessionUser");
-                Order order = orderService.find(Long.parseLong(path.split("/")[2]));
+                Order order = orderService.find(getId(req));
 
                 if (user.getLogin().equals(order.getOwner().getLogin()))
                     if (user.getBalance().compareTo(order.getFullPrice()) >= 0) {
@@ -125,37 +124,40 @@ public class OrderControllerServlet extends HttpServlet {
                         req.getSession().setAttribute("sessionUser", userService.find(user.getLogin()));
                     }
 
-                resp.sendRedirect("/order");
+                resp.sendRedirect(Path.ORDER_INDEX.getPath());
                 return;
             }
 
-            case "close": {
+            case ORDER_CLOSE: {
                 if (userService.isAccessGranted(req)) {
-                    Order order = orderService.find(Long.parseLong(path.split("/")[2]));
+                    Order order = orderService.find(getId(req));
                     orderService.close(order);
 
-                    resp.sendRedirect("/order");
+                    resp.sendRedirect(Path.ORDER_INDEX.getPath());
                     return;
                 }
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 
-            case "delete":
+            case ORDER_DELETE:
                 if (userService.isAccessGranted(req)) {
-                    Long id = Long.parseLong(path.split("/")[2]);
+                    Long id = getId(req);
                     orderService.delete(orderService.find(id));
-                    resp.sendRedirect("/order");
+
+                    resp.sendRedirect(Path.ORDER_INDEX.getPath());
                     return;
                 }
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
 
-            case "error":
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
+    }
 
+    private Long getId(HttpServletRequest req){
+        return Long.parseLong(req.getPathInfo().split("/")[2]);
     }
 }

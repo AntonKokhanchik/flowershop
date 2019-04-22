@@ -3,6 +3,8 @@ package flowershop.backend.services;
 import flowershop.backend.dto.Flower;
 import flowershop.backend.entity.FlowerEntity;
 import flowershop.backend.exception.FlowerValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +18,15 @@ import java.util.List;
 
 @Service
 public class FlowerServiceImpl implements FlowerService {
+    private static final Logger LOG = LoggerFactory.getLogger(FlowerServiceImpl.class);
+
     @PersistenceContext
     private EntityManager em;
 
     @PostConstruct
     public void initialize()
     {
-        System.out.println("Flower service on");
+        LOG.info("Flower service on");
     }
 
     @Override
@@ -30,6 +34,7 @@ public class FlowerServiceImpl implements FlowerService {
     public void create(Flower flower) throws FlowerValidationException {
         validate(flower);
         em.persist(flower.toEntity());
+        LOG.info("flower {} created", flower);
     }
 
     @Override
@@ -37,12 +42,16 @@ public class FlowerServiceImpl implements FlowerService {
     public void update(Flower flower) throws FlowerValidationException {
         validate(flower);
         em.merge(flower.toEntity());
+
+        LOG.info("flower {} updated", flower);
     }
 
     @Override
     @Transactional
     public void delete(Flower flower) {
         em.remove(em.find(FlowerEntity.class, flower.getId()));
+
+        LOG.info("flower {} deleted", flower);
     }
 
     @Override

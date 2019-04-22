@@ -97,7 +97,7 @@ public class UserEntity {
     public String toString() {
         return "User{" +
                 "login='" + login + '\'' +
-                ", password='" + password + '\'' +
+                ", password='" + "*".repeat(password.length()) + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", address='" + address + '\'' +
                 ", phone='" + phone + '\'' +

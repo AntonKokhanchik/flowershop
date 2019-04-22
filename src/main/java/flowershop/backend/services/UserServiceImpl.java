@@ -3,6 +3,8 @@ package flowershop.backend.services;
 import flowershop.backend.dto.User;
 import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.UserValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +18,14 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService{
+    private static final Logger LOG = LoggerFactory.getLogger(FlowerServiceImpl.class);
+
     @PersistenceContext
     private EntityManager em;
 
     @PostConstruct
     public void init(){
-        System.out.println("User service on");
+        LOG.info("User service on");
     }
 
     @Override
@@ -36,6 +40,8 @@ public class UserServiceImpl implements UserService{
         user.setDiscount(0);
 
         em.persist(user.toEntity());
+
+        LOG.info("New user {} registeded", user);
     }
 
     @Override
@@ -103,9 +109,11 @@ public class UserServiceImpl implements UserService{
         if(user == null)
             throw new UserValidationException(UserValidationException.WRONG_LOGIN);
 
-        if (password.equals(user.getPassword()))
-            return new User(user);
-        throw new UserValidationException(UserValidationException.WRONG_PASSWORD);
+        if (!password.equals(user.getPassword()))
+            throw new UserValidationException(UserValidationException.WRONG_PASSWORD);
+
+        LOG.info("User {} logged in", user);
+        return new User(user);
     }
 
     @Override

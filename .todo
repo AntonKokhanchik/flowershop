@@ -97,21 +97,21 @@ todo-list:
         git commit –m “Initial commit”
     [x] Commit changes to repo after stable features implemented (like in 5 but with feature description in commit)
 
-TODO[ ] Module 4 Activity:
-    [+] Create FlowerShop application package structure
-    [+] Create entities, DTOs stubs (no attributes) that should be in application
-    [+] Create business and access services interfaces with needed methods (no implementation required)
+[x] Module 4 Activity:
+    [x] Create FlowerShop application package structure
+    [x] Create entities, DTOs stubs (no attributes) that should be in application
+    [x] Create business and access services interfaces with needed methods (no implementation required)
 
-TODO[ ] Module 5 Activity:
-    [+] Introduce spring context to the Flowers shop web application
-    [+] Create empty implementation classes for business and access services, annotate them as beans
-    [+] Inject access services beans to dependent business services
-    [+] Add some System.out to beans constructors to check beans creation during application startup
+[x] Module 5 Activity:
+    [x] Introduce spring context to the Flowers shop web application
+    [x] Create empty implementation classes for business and access services, annotate them as beans
+    [x] Inject access services beans to dependent business services
+    [x] Add some System.out to beans constructors to check beans creation during application startup
 
-TODO[ ] Module 6 Activity:
-    [ ] Add both slf4j dependencies to your project pom
-    [ ] Find and add relevant logback dependency from central maven repo (https://mvnrepository.com/)
-    [ ] Introduce logging to the Flowers shop web application. Change System.out calls to logging calls
+[x] Module 6 Activity:
+    [x] Add both slf4j dependencies to your project pom
+    [x] Find and add relevant logback dependency from central maven repo (https://mvnrepository.com/)
+    [x] Introduce logging to the Flowers shop web application. Change System.out calls to logging calls
 
 [x] Module 7 Activity. Part 1:
     [x] Create login page with
@@ -135,7 +135,7 @@ TODO[ ] Module 6 Activity:
         Pass data to business service
         Redirect to login page
 
-TODO[ ] Module 8 Activity:
+[x] Module 8 Activity:
     [x] Create DataSource on tomcat
         You will need to put following artifact jars to Tomcat/lib:
         commons-dbcp:commons-dbcp:1.4 (download from maven central)
@@ -143,7 +143,7 @@ TODO[ ] Module 8 Activity:
     [x] Integrate JPA(+Transactions) with Spring and Hibernate
     [x] Write DB scripts to create user table, integrate flyway to application
     [x] Use DB access layer to implement user login/registration using H2 DB
-    [+] Implement other application functionality according to application requirements
+    [x] Implement other application functionality according to application requirements
 
 TODO[ ] Module 9 Activity:
     [ ] Add maven dependencies:

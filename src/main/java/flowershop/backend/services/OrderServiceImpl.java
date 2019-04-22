@@ -7,6 +7,8 @@ import flowershop.backend.dto.User;
 import flowershop.backend.entity.OrderEntity;
 import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.FlowerValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,22 +24,28 @@ import java.util.Map;
 
 @Service
 public class OrderServiceImpl implements OrderService {
+    private static final Logger LOG = LoggerFactory.getLogger(FlowerServiceImpl.class);
+
     @PersistenceContext
     private EntityManager em;
 
     @PostConstruct
     public void initialize()
     {
-        System.out.println("Order service on");
+        LOG.info("Order service on");
     }
 
     @Override
     @Transactional
     public void create(Order order) {
         validate(order);
+
         order.setDateCreation(LocalDateTime.now());
         order.setDateClosing(null);
+
         em.persist(order);
+
+        LOG.info("new order {} created", order);
     }
 
     @Override
@@ -48,6 +56,7 @@ public class OrderServiceImpl implements OrderService {
         for (Map.Entry<Flower, Integer> item : cart.items.entrySet()) {
             Flower flower = item.getKey();
             flower.setCount(flower.getCount() - item.getValue());
+
             if (flower.getCount() < 0)
                 throw new FlowerValidationException(FlowerValidationException.NOT_ENOUGH_FLOWERS);
 
@@ -64,6 +73,8 @@ public class OrderServiceImpl implements OrderService {
 
         // save
         em.persist(order);
+
+        LOG.info("new order {} created", order);
     }
 
     @Override
@@ -75,6 +86,8 @@ public class OrderServiceImpl implements OrderService {
         owner.setBalance(owner.getBalance().subtract(orderEntity.getFullPrice()));
 
         orderEntity.setStatus(OrderStatus.PAID);
+
+        LOG.info("Order {} paid", order);
     }
 
     @Override
@@ -84,12 +97,15 @@ public class OrderServiceImpl implements OrderService {
 
         orderEntity.setStatus(OrderStatus.CLOSED);
         orderEntity.setDateClosing(LocalDateTime.now());
+
+        LOG.info("new order {} closed", order);
     }
 
     @Override
     @Transactional
     public void delete(Order order) {
         em.remove(em.find(OrderEntity.class, order.getId()));
+        LOG.info("new order {} deleted", order);
     }
 
     @Override

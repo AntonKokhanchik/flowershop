@@ -145,16 +145,16 @@ todo-list:
     [x] Use DB access layer to implement user login/registration using H2 DB
     [x] Implement other application functionality according to application requirements
 
-TODO[ ] Module 9 Activity:
-    [ ] Add maven dependencies:
+[x] Module 9 Activity:
+    [x] Add maven dependencies:
         spring-oxm 4.2.0.RELEASE
         Castor 1.2
         xercesImpl 2.8.1
-    [ ] Create UserMarshgallingServiceImpl service which can convert given user object to XML and put
+    [x] Create UserMarshgallingServiceImpl service which can convert given user object to XML and put
         file with XML content to target file directory:
         Target directory location should be set in property configuration file
         Use org.springframework.oxm.castor.CastorMarshaller to marshall user object to XML
-    [ ] Call UserMarshgallingServiceImpl method after each user successful registration
+    [x] Call UserMarshgallingServiceImpl method after each user successful registration
 
 TODO[ ] Module 10 Activity:
     [ ] Introduce Apache CXF to flower shop application

@@ -5,6 +5,8 @@ import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.UserValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,7 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,8 +23,14 @@ import java.util.List;
 public class UserServiceImpl implements UserService{
     private static final Logger LOG = LoggerFactory.getLogger(FlowerServiceImpl.class);
 
+    @Autowired
+    private XMLConverter converter;
+
     @PersistenceContext
     private EntityManager em;
+
+    @Value("${flowershop.backend.config}")
+    private String prop;
 
     @PostConstruct
     public void init(){
@@ -42,6 +51,7 @@ public class UserServiceImpl implements UserService{
         em.persist(user.toEntity());
 
         LOG.info("New user {} registeded", user);
+        createXML(user);
     }
 
     @Override
@@ -114,6 +124,20 @@ public class UserServiceImpl implements UserService{
 
         LOG.info("User {} logged in", user);
         return new User(user);
+    }
+
+    @Override
+    // TODO: брать путь для создания xml из конфига
+    public void createXML(User user){
+        try {
+            converter.convertFromObjectToXML(user, "user "+user.getLogin()+".xml");
+            LOG.info("user "+user.getLogin()+".xml created");
+
+//            user = (User) converter.convertFromXMLToObject("user "+user.getLogin()+".xml");
+//            LOG.info("if convert back will be " + user);
+        } catch (IOException e) {
+            LOG.error("Failed to convert to xml");
+        }
     }
 
     @Override

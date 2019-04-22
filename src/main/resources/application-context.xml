@@ -59,6 +59,14 @@
         <property name="entityManagerFactory" ref="entityManagerFactory" />
     </bean>
 
-    <tx:annotation-driven/>
+    <bean id="XMLConverter" class="flowershop.backend.services.XMLConverter">
+        <property name="marshaller" ref="castorMarshaller" />
+        <property name="unmarshaller" ref="castorMarshaller" />
+    </bean>
 
+    <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller">
+        <property name="mappingLocation" value="classpath:mapping.xml" />
+    </bean>
+
+    <tx:annotation-driven/>
 </beans>

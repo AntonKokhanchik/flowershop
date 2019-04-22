@@ -14,6 +14,8 @@ public class User {
     private BigDecimal balance;
     private Integer discount;
 
+    public User(){}
+
     public User(String login, String password, String fullName, String address,
                 String phone){
         this.login = login;

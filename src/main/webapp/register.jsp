@@ -16,7 +16,7 @@
                     <input class='form-control ${loginErrorMsg != null ? "is-invalid" : ""}'
                         id="login" name="login" value="${login}" required/>
                     <div class="invalid-feedback">
-                        ${loginErrorMsg}
+                        This login is already taken
                     </div>
                 </div>
 
@@ -40,9 +40,27 @@
                     <input class="form-control" id="phone" name="phone" value="${phone}" />
                 </div>
 
-                <input class="btn btn-primary" type="submit" value="Register" />
+                <input id="submit" class="btn btn-primary" type="submit" value="Register" />
             </form>
         </div>
+
+        <script>
+            $("#login").change(function(){
+                $.ajax({
+                    url: "/rest/check_login/"+$("#login").val(),
+                    success: function(data) {
+                        if (data == "false"){
+                            $("#submit").removeAttr("disabled");
+                            $("#login").removeClass("is-invalid");
+                        }
+                        else{
+                            $("#submit").attr("disabled", "true");
+                            $("#login").addClass("is-invalid");
+                        }
+                    }
+                });
+            });
+        </script>
 
 
     </jsp:body>

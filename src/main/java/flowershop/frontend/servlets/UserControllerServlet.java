@@ -111,7 +111,6 @@ public class UserControllerServlet extends HttpServlet {
     private void handleValidationError(UserValidationException e, HttpServletRequest req){
         String attrName = "anotherErrorMsg";
         switch (e.getMessage()) {
-            case UserValidationException.LOGIN_IS_TAKEN:
             case UserValidationException.WRONG_LOGIN:
                 attrName = "loginErrorMsg";
                 break;

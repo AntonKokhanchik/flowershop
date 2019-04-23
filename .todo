@@ -167,15 +167,15 @@ todo-list:
         Application should call increaseFlowersStockSize each 10 minutes and increase stock size
         on random number from 10 to 30.
 
-TODO[ ] Module 11 Activity:
-    [ ] Add jersey dependencies (v2.24.1):
+[x] Module 11 Activity:
+    [x] Add jersey dependencies (v2.24.1):
         jersey-container-servlet
         jersey-media-json-jackson
         jersey-spring3
-    [ ] Configure Jersey in web.xml
-    [ ] Create restful web service that receives user login as parameter and returns true if given login is
+    [x] Configure Jersey in web.xml
+    [x] Create restful web service that receives user login as parameter and returns true if given login is
         already exists and application and false if not
-    [ ] Call this rest service from registration page on each login input field change
+    [x] Call this rest service from registration page on each login input field change
         (use Jquery.ajax to call rest service). Show user the information message if inputted
         login already exists. Register button should be disabled in that case.
 

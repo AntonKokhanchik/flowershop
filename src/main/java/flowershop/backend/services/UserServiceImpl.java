@@ -38,9 +38,6 @@ public class UserServiceImpl implements UserService{
     public void create(User user) throws UserValidationException {
         validate(user);
 
-        if (em.find(UserEntity.class, user.getLogin()) != null)
-            throw new UserValidationException(UserValidationException.LOGIN_IS_TAKEN);
-
         user.setBalance(new BigDecimal(2000));
         user.setDiscount(0);
 

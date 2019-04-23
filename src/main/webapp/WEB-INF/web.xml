@@ -24,4 +24,18 @@
         <servlet-name>CXFServlet</servlet-name>
         <url-pattern>/ws/*</url-pattern> <!-- URL to access web services -->
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>jersey-servlet</servlet-name>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>flowershop.webService.rest</param-value>
+        </init-param>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>jersey-servlet</servlet-name>
+        <url-pattern>/rest/*</url-pattern> <!-- URL to access web services -->
+    </servlet-mapping>
 </web-app>

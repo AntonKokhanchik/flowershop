@@ -6,7 +6,6 @@ import flowershop.backend.exception.UserValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +27,6 @@ public class UserServiceImpl implements UserService{
 
     @PersistenceContext
     private EntityManager em;
-
-    @Value("${flowershop.backend.config}")
-    private String prop;
 
     @PostConstruct
     public void init(){
@@ -130,7 +126,7 @@ public class UserServiceImpl implements UserService{
     // TODO: брать путь для создания xml из конфига
     public void createXML(User user){
         try {
-            converter.convertFromObjectToXML(user, "user "+user.getLogin()+".xml");
+            converter.convertFromObjectToXML(user, "userXML/user_"+user.getLogin()+".xml");
             LOG.info("user "+user.getLogin()+".xml created");
 
 //            user = (User) converter.convertFromXMLToObject("user "+user.getLogin()+".xml");

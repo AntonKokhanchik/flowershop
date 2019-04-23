@@ -156,14 +156,14 @@ todo-list:
         Use org.springframework.oxm.castor.CastorMarshaller to marshall user object to XML
     [x] Call UserMarshgallingServiceImpl method after each user successful registration
 
-TODO[ ] Module 10 Activity:
-    [ ] Introduce Apache CXF to flower shop application
-    [ ] Implement web service(FlowersStockWebService) with single operation: increaseFlowersStockSize (int count)
+[x] Module 10 Activity:
+    [x] Introduce Apache CXF to flower shop application
+    [x] Implement web service(FlowersStockWebService) with single operation: increaseFlowersStockSize (int count)
         – increases amount of flowers of all types on count parameter
-    [ ] Install SOAP UI application – tool for testing Web Services
+    [x] Install SOAP UI application – tool for testing Web Services
         https://www.soapui.org/
-    [ ] Load your WSDL to SOAP UI and test increaseFlowersStockSize service
-    [ ] Create standalone Java application with Web service client for FlowersStockWebService.
+    [x] Load your WSDL to SOAP UI and test increaseFlowersStockSize service
+    [x] Create standalone Java application with Web service client for FlowersStockWebService.
         Application should call increaseFlowersStockSize each 10 minutes and increase stock size
         on random number from 10 to 30.
 

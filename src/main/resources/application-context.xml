@@ -4,6 +4,7 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -12,7 +13,9 @@
         http://www.springframework.org/schema/tx
         http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/jee
-        http://www.springframework.org/schema/jee/spring-jee.xsd">
+        http://www.springframework.org/schema/jee/spring-jee.xsd
+        http://cxf.apache.org/jaxws
+        http://cxf.apache.org/schemas/jaxws.xsd">
 
     <context:component-scan base-package="flowershop"/>
 
@@ -69,4 +72,9 @@
     </bean>
 
     <tx:annotation-driven/>
+
+    <!-- Service implementor bean -->
+    <bean id="FlowersStockImpl" class="flowershop.webService.FlowersStockServiceImpl" />
+    <!-- JAX-WS endpoint bean which is picked up by CXF -->
+    <jaxws:endpoint id="FlowersStock" implementor="#FlowersStockImpl" address="/FlowersStock"/>
 </beans>

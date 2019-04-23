@@ -1,10 +1,11 @@
 create table ORDERS(
-    id bigint auto_increment,
-    fullPrice decimal,
-    dateCreation timestamp,
+    id bigint primary key auto_increment,
+    fullPrice decimal not null check (fullPrice >= 0),
+    dateCreation timestamp not null,
     dateClosing timestamp,
-    status varchar(10),
-    owner_login varchar(30)
+    status varchar(10) check (status in ('CREATED', 'PAID', 'CLOSED')),
+    owner_login varchar(30),
+    foreign key (owner_login) references USERS(login)
 );
 
 -- some test values

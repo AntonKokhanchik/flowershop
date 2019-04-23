@@ -1,8 +1,8 @@
 create table FLOWERS(
-    id bigint auto_increment,
-    title varchar(30),
-    price decimal,
-    count int
+    id bigint primary key auto_increment,
+    title varchar(30) not null,
+    price decimal check (price >= 0),
+    count int check (count >= 0)
 );
 
 -- some test values

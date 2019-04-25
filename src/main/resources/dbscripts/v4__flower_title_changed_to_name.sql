@@ -1,0 +1,1 @@
+alter table FLOWERS alter column title rename to name;

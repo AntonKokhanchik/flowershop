@@ -2,6 +2,7 @@ package flowershop.backend.entity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -16,8 +17,8 @@ public class UserEntity {
     private String phone;
     private BigDecimal balance;
     private Integer discount;
-    @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade=CascadeType.ALL)
-    private List<OrderEntity> orders;
+    @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<OrderEntity> orders = new LinkedList<>();
 
     public String getLogin() {
         return login;

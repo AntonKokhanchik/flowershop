@@ -10,7 +10,7 @@ public class FlowerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title;
+    private String name;
     private BigDecimal price;
     private Integer count;
 
@@ -23,12 +23,12 @@ public class FlowerEntity {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public BigDecimal getPrice() {
@@ -51,7 +51,7 @@ public class FlowerEntity {
     @Override
     public String toString() {
         return "Flower{" +
-                "title='" + title + '\'' +
+                "name='" + name + '\'' +
                 ", price=" + price +
                 ", count=" + count +
                 '}';

@@ -13,22 +13,25 @@ public class Order {
     private LocalDateTime dateCreation;
     private LocalDateTime dateClosing;
     private OrderStatus status;
+    private Integer appliedDiscount;
     private User owner;
 
-    public Order(Long id, BigDecimal fullPrice, LocalDateTime dateCreation, LocalDateTime dateClosing, OrderStatus status){
-        this.id = id;
+    public Order(BigDecimal fullPrice, LocalDateTime dateCreation,
+                 LocalDateTime dateClosing, OrderStatus status, Integer appliedDiscount) {
         this.fullPrice = fullPrice;
         this.dateCreation = dateCreation;
         this.dateClosing = dateClosing;
         this.status = status;
+        this.appliedDiscount = appliedDiscount;
     }
 
-    public Order(OrderEntity entity){
+    public Order(OrderEntity entity) {
         id = entity.getId();
         fullPrice = entity.getFullPrice();
         dateCreation = entity.getDateCreation();
         dateClosing = entity.getDateClosing();
         status = entity.getStatus();
+        appliedDiscount = entity.getAppliedDiscount();
         owner = new User(entity.getOwner());
     }
 
@@ -80,13 +83,22 @@ public class Order {
         this.owner = owner;
     }
 
-    public OrderEntity toEntity(){
+    public Integer getAppliedDiscount() {
+        return appliedDiscount;
+    }
+
+    public void setAppliedDiscount(Integer appliedDiscount) {
+        this.appliedDiscount = appliedDiscount;
+    }
+
+    public OrderEntity toEntity() {
         OrderEntity entity = new OrderEntity();
         entity.setId(id);
         entity.setFullPrice(fullPrice);
         entity.setDateCreation(dateCreation);
         entity.setDateClosing(dateClosing);
         entity.setStatus(status);
+        entity.setAppliedDiscount(appliedDiscount);
 
         return entity;
     }
@@ -100,23 +112,25 @@ public class Order {
                 Objects.equals(fullPrice, order.fullPrice) &&
                 Objects.equals(dateCreation, order.dateCreation) &&
                 Objects.equals(dateClosing, order.dateClosing) &&
-                status == order.status;
+                status == order.status &&
+                Objects.equals(appliedDiscount, order.appliedDiscount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fullPrice, dateCreation, dateClosing, status);
+        return Objects.hash(id, fullPrice, dateCreation, dateClosing, status, appliedDiscount);
     }
 
     @Override
     public String toString() {
         return "Order{" +
-                "id="+ id +
+                "id=" + id +
                 ", fullPrice=" + fullPrice +
                 ", dateCreation=" + dateCreation +
                 ", dateClosing=" + dateClosing +
                 ", status=" + status +
-                ", owner=" + owner +
+                ", appliedDiscount=" + appliedDiscount +
+                ", owner=" + owner.getLogin() +
                 '}';
     }
 }

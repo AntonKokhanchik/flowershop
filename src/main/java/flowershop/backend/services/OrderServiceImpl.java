@@ -1,7 +1,10 @@
 package flowershop.backend.services;
 
-import flowershop.backend.enums.OrderStatus;
 import flowershop.backend.dto.Flower;
+import flowershop.backend.dto.OrderFlowerData;
+import flowershop.backend.entity.FlowerEntity;
+import flowershop.backend.entity.OrderFlowerDataEntity;
+import flowershop.backend.enums.OrderStatus;
 import flowershop.backend.dto.Order;
 import flowershop.backend.dto.User;
 import flowershop.backend.entity.OrderEntity;
@@ -15,12 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -53,19 +52,26 @@ public class OrderServiceImpl implements OrderService {
     public void create(Cart cart, User user) throws FlowerValidationException {
         // decrease flowers count
         // TODO: здесь надо продумать изменение количества цветов между созданием корзины и созданием заказа
-        for (Map.Entry<Flower, Integer> item : cart.items.entrySet()) {
-            Flower flower = item.getKey();
+        for (Map.Entry<Long, Integer> item : cart.items.entrySet()) {
+            FlowerEntity flower = em.find(FlowerEntity.class, item.getKey());
             flower.setCount(flower.getCount() - item.getValue());
 
             if (flower.getCount() < 0)
                 throw new FlowerValidationException(FlowerValidationException.NOT_ENOUGH_FLOWERS);
-
-            em.merge(flower.toEntity());
         }
 
+        DetailedCart detailedCart = generateDetailedCart(cart);
+
         // create order
-        OrderEntity order = new Order(null, cart.getResult(user.getDiscount()),
-                LocalDateTime.now(), null, OrderStatus.CREATED).toEntity();
+        OrderEntity order = new Order(detailedCart.getResult(user.getDiscount()),
+                LocalDateTime.now(), null, OrderStatus.CREATED, user.getDiscount()).toEntity();
+
+        // add flower data
+        for (OrderFlowerData f : detailedCart.items) {
+            OrderFlowerDataEntity fe = f.toEntity();
+            em.persist(fe);
+            order.addFlowerData(fe);
+        }
 
         // set owner
         UserEntity userEntity = em.find(UserEntity.class, user.getLogin());
@@ -138,22 +144,32 @@ public class OrderServiceImpl implements OrderService {
         return orders;
     }
 
+    @Transactional
+    @Override
+    public List<OrderFlowerData> getFlowersData(Order order){
+        OrderEntity entity = em.find(OrderEntity.class, order.getId());
+        List<OrderFlowerDataEntity> entities = entity.getFlowersData();
+
+        List<OrderFlowerData> flowersData = new LinkedList<>();
+
+        for(OrderFlowerDataEntity e : entities)
+            flowersData.add(new OrderFlowerData(e));
+
+        return flowersData;
+    }
+
     @Override
     public void validate(Order order) {
 
     }
 
     @Override
-    public Order parse(HttpServletRequest req) {
-        String sid = req.getParameter("id");
-        Long id = sid == null ? null : Long.parseLong(sid);
+    public DetailedCart generateDetailedCart(Cart cart){
+        Set<OrderFlowerData> items = new HashSet<>();
 
-        return new Order(
-                id,
-                new BigDecimal(req.getParameter("fullPrice")),
-                LocalDateTime.parse(req.getParameter("dateCreation")),
-                LocalDateTime.parse(req.getParameter("dateClosing")),
-                OrderStatus.valueOf(req.getParameter("status"))
-        );
+        for (Map.Entry<Long, Integer> entry : cart.items.entrySet())
+            items.add(new Flower(em.find(FlowerEntity.class, entry.getKey())).toOrderData(entry.getValue()));
+
+        return new DetailedCart(items);
     }
 }

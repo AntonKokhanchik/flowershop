@@ -2,73 +2,60 @@ package flowershop.backend.services;
 
 import flowershop.backend.dto.Flower;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Cart {
-    Map<Flower, Integer> items;
-    BigDecimal sum;
+    Map<Long, Integer> items;
 
-    public Cart()
-    {
+    public Cart() {
         items = new HashMap<>();
-        sum = new BigDecimal(0);
     }
 
-    public void addItem(Flower flower){
-        if (flower.getCount() < 1)
-            return;
-
-        if (items.containsKey(flower))
-            if (items.get(flower) < flower.getCount())
-                items.put(flower, items.get(flower) + 1);
-            else
-                return;
-        else
-            items.put(flower, 1);
-
-        sum = sum.add(flower.getPrice());
-    }
-
-    public void removeItem(Flower flower){
-        if (!items.containsKey(flower))
-            return;
-
-        items.put(flower, items.get(flower) - 1);
-
-        if (items.get(flower) == 0)
-            items.remove(flower);
-
-        sum = sum.subtract(flower.getPrice());
-    }
-
-    public void clear(){
-        items = new HashMap<>();
-        sum = new BigDecimal(0);
-    }
-
-    public BigDecimal getResult(Integer discount){
-        return sum.multiply(new BigDecimal(1-discount/100));
-    }
-
-    public Map<Flower, Integer> getItems() {
+    public Map<Long, Integer> getItems() {
         return items;
     }
 
-    public void setItems(Map<Flower, Integer> items) {
+    public void setItems(Map<Long, Integer> items) {
         this.items = items;
     }
 
-    public BigDecimal getSum() {
-        return sum;
+    public void addItem(Flower flower) {
+        if (flower.getCount() < 1)
+            return;
+
+        Long flowerId = flower.getId();
+        if (items.containsKey(flowerId)) {
+            if (items.get(flowerId) < flower.getCount())
+                items.put(flowerId, items.get(flowerId) + 1);
+        } else
+            items.put(flowerId, 1);
+        System.out.println(items);
     }
 
-    public void setSum(BigDecimal sum) {
-        this.sum = sum;
+    public void removeItem(Flower flower) {
+        Long flowerId = flower.getId();
+        if (!items.containsKey(flowerId))
+            return;
+
+        items.put(flowerId, items.get(flowerId) - 1);
+
+        if (items.get(flowerId) == 0)
+            items.remove(flowerId);
     }
 
-    public boolean isEmpty(){
+    public void clear() {
+        items = new HashMap<>();
+    }
+
+    public boolean isEmpty() {
         return items.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        return "Cart{" +
+                "items=" + items +
+                '}';
     }
 }

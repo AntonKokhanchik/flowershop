@@ -15,12 +15,17 @@
                     <th scope="col">Title</th>
                     <th scope="col">Price</th>
                     <th scope="col">Count</th>
+                    <th scope="col"></th>
+                    <c:if test="${sessionUser.isAdmin()}">
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    </c:if>
                 </tr>
             </thead>
             <tbody>
                 <c:forEach items="${flowers}" var="f">
                     <tr>
-                        <td>${f.title}</th>
+                        <td>${f.name}</th>
                         <td>${f.price}</td>
                         <td>${f.count}</td>
                         <td>

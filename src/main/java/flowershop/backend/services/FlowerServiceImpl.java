@@ -24,8 +24,7 @@ public class FlowerServiceImpl implements FlowerService {
     private EntityManager em;
 
     @PostConstruct
-    public void initialize()
-    {
+    public void initialize() {
         LOG.info("Flower service on");
     }
 
@@ -64,7 +63,7 @@ public class FlowerServiceImpl implements FlowerService {
         List<FlowerEntity> entities = em.createNamedQuery("getAllFlowers", FlowerEntity.class).getResultList();
         List<Flower> flowers = new LinkedList<>();
 
-        for(FlowerEntity e : entities)
+        for (FlowerEntity e : entities)
             flowers.add(new Flower(e));
 
         return flowers;
@@ -72,8 +71,8 @@ public class FlowerServiceImpl implements FlowerService {
 
     @Override
     public void validate(Flower flower) throws FlowerValidationException {
-        if (flower.getTitle() == null)
-            flower.setTitle("Unnamed");
+        if (flower.getName() == null)
+            flower.setName("Unnamed");
 
         if (flower.getPrice() == null)
             flower.setPrice(new BigDecimal(0));
@@ -96,7 +95,7 @@ public class FlowerServiceImpl implements FlowerService {
         BigDecimal price;
         try {
             price = new BigDecimal(req.getParameter("price"));
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             throw new FlowerValidationException(FlowerValidationException.WRONG_PRICE);
         }
 
@@ -106,11 +105,11 @@ public class FlowerServiceImpl implements FlowerService {
 
         Integer count;
         try {
-            count = Integer.parseInt(req.getParameter("count"));
-        } catch (NumberFormatException e){
+            count = Integer.parseInt(parameter);
+        } catch (NumberFormatException e) {
             throw new FlowerValidationException(FlowerValidationException.WRONG_COUNT);
         }
 
-        return new Flower(id, req.getParameter("title"), price, count);
+        return new Flower(id, req.getParameter("name"), price, count);
     }
 }

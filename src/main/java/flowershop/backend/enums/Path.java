@@ -9,6 +9,7 @@ public enum Path {
     LOGOUT          ("/user/logout",    false),
     USER_INDEX      ("/user",           false,"/userIndex.jsp"),
     ORDER_NEW       ("/order/new",      false),
+    ORDER_SHOW      ("/order/detail",   true, "/orderShow.jsp" ),
     ADD_TO_CART     ("/order/add_to_cart",true),
     REMOVE_FROM_CART("/order/remove_from_cart",true),
     ORDER_PAY       ("/order/pay",      true),

@@ -14,9 +14,9 @@
                 <input type="hidden" id="id" name="id" value="${id == null ? flower.id : id}" />
 
                 <div class="form-group">
-                    <label for="title">Title</label>
-                    <input class="form-control" id="title" name="title" required
-                        value="${title == null ? flower.title : title}" />
+                    <label for="name">Name</label>
+                    <input class="form-control" id="name" name="name" required
+                        value="${name == null ? flower.name : name}" />
                 </div>
 
                 <div class="form-group">

@@ -11,21 +11,31 @@
         <h2>Orders</h2>
         <c:choose>
             <c:when test="${orders != null}">
-                <table class="table">
+                <table class="table table-hover">
                     <thead>
                         <tr>
+                            <th scope="col"></th>
                             <th scope="col">Price</th>
                             <th scope="col">Status</th>
                             <th scope="col">Created</th>
                             <th scope="col">Closed</th>
-                            <c:if test="${sessionUser.isAdmin()}">
-                                <th scope="col">Owner</th>
-                            </c:if>
+                            <c:choose>
+                                <c:when test="${sessionUser.isAdmin()}">
+                                    <th scope="col">Owner</th>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                </c:when>
+                                <c:otherwise>
+                                    <th scope="col"></th>
+                                </c:otherwise>
+                            </c:choose>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach items="${orders}" var="o">
                             <tr>
+                                <td><a class="btn btn-link" href="${path.ORDER_SHOW}/${o.id}">more</a></td>
                                 <td>${o.fullPrice}</th>
                                 <td>${o.status}</td>
                                 <td>${o.dateCreation}</td>

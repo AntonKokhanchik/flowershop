@@ -1,10 +1,11 @@
 package flowershop.backend.services;
 
 import flowershop.backend.dto.Order;
+import flowershop.backend.dto.OrderFlowerData;
 import flowershop.backend.dto.User;
 import flowershop.backend.exception.FlowerValidationException;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface OrderService {
@@ -16,6 +17,11 @@ public interface OrderService {
     Order find(Long id);
     List<Order> getAll();
     List<Order> getByUser(User user);
+
+    @Transactional
+    List<OrderFlowerData> getFlowersData(Order order);
+
     void validate(Order order);
-    Order parse(HttpServletRequest req);
+
+    DetailedCart generateDetailedCart(Cart cart);
 }

@@ -62,11 +62,11 @@
                                         your discount: ${sessionUser.discount}
         </c:if>
         <div class="jumbotron row" style="margin-top:-50px">
-            <div class="col-8">
+            <div class="col-lg-8">
                 <jsp:doBody/>
             </div>
 
-            <div class="col-4">
+            <div class="col-lg-4">
                 <c:import url="_cart.jsp"/>
             </div>
         </div>

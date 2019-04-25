@@ -45,9 +45,9 @@ public class OrderControllerServlet extends HttpServlet {
             return;
         }
 
-        switch (path){
+        switch (path) {
             case ORDER_INDEX:
-                User user = (User)req.getSession().getAttribute("sessionUser");
+                User user = (User) req.getSession().getAttribute("sessionUser");
 
                 if (user != null)
                     if (user.isAdmin())
@@ -55,6 +55,12 @@ public class OrderControllerServlet extends HttpServlet {
                     else
                         req.setAttribute("orders", orderService.getByUser(user));
 
+                break;
+
+            case ORDER_SHOW:
+                Order order = orderService.find(getId(req));
+                req.setAttribute("order", order);
+                req.setAttribute("items", orderService.getFlowersData(order));
                 break;
 
             default:
@@ -65,7 +71,7 @@ public class OrderControllerServlet extends HttpServlet {
     }
 
     @Override
-    protected  void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Path path = Path.get(req.getRequestURI());
 
         if (path == null) {
@@ -73,17 +79,18 @@ public class OrderControllerServlet extends HttpServlet {
             return;
         }
 
-        switch (path){
+        switch (path) {
             case ORDER_NEW: {
                 Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
 
                 try {
                     orderService.create(cart, (User) req.getSession().getAttribute("sessionUser"));
-                }catch(FlowerValidationException e) {
+                } catch (FlowerValidationException e) {
                     req.getSession().setAttribute("cartErrorMsg", e.getMessage());
                 }
                 cart.clear();
                 req.getSession().setAttribute("sessionCart", cart);
+                req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));
 
                 resp.sendRedirect(Path.ORDER_INDEX.getPath());
                 return;
@@ -98,6 +105,7 @@ public class OrderControllerServlet extends HttpServlet {
                 cart.addItem(flowerService.find(flowerId));
 
                 req.getSession().setAttribute("sessionCart", cart);
+                req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));
 
                 resp.sendRedirect(Path.FLOWER_INDEX.getPath());
                 return;
@@ -110,6 +118,7 @@ public class OrderControllerServlet extends HttpServlet {
                 cart.removeItem(flowerService.find(id));
 
                 req.getSession().setAttribute("sessionCart", cart);
+                req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));
                 resp.sendRedirect(Path.FLOWER_INDEX.getPath());
                 return;
             }
@@ -157,7 +166,7 @@ public class OrderControllerServlet extends HttpServlet {
         }
     }
 
-    private Long getId(HttpServletRequest req){
+    private Long getId(HttpServletRequest req) {
         return Long.parseLong(req.getPathInfo().split("/")[2]);
     }
 }

@@ -7,20 +7,20 @@ import java.util.Objects;
 
 public class Flower {
     private Long id;
-    private String title;
+    private String name;
     private BigDecimal price;
     private Integer count;
 
-    public Flower(Long id, String title, BigDecimal price, Integer count){
+    public Flower(Long id, String name, BigDecimal price, Integer count) {
         this.id = id;
-        this.title = title;
+        this.name = name;
         this.price = price;
         this.count = count;
     }
 
-    public Flower(FlowerEntity entity){
+    public Flower(FlowerEntity entity) {
         id = entity.getId();
-        title = entity.getTitle();
+        name = entity.getName();
         price = entity.getPrice();
         count = entity.getCount();
     }
@@ -33,12 +33,12 @@ public class Flower {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public BigDecimal getPrice() {
@@ -57,14 +57,18 @@ public class Flower {
         this.count = count;
     }
 
-    public FlowerEntity toEntity(){
+    public FlowerEntity toEntity() {
         FlowerEntity entity = new FlowerEntity();
         entity.setId(id);
-        entity.setTitle(title);
+        entity.setName(name);
         entity.setPrice(price);
         entity.setCount(count);
 
         return entity;
+    }
+
+    public OrderFlowerData toOrderData(Integer count) {
+        return new OrderFlowerData(name, price, count, id);
     }
 
     @Override
@@ -73,21 +77,21 @@ public class Flower {
         if (o == null || getClass() != o.getClass()) return false;
         Flower flower = (Flower) o;
         return Objects.equals(id, flower.id) &&
-                Objects.equals(title, flower.title) &&
+                Objects.equals(name, flower.name) &&
                 Objects.equals(price, flower.price) &&
                 Objects.equals(count, flower.count);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, price, count);
+        return Objects.hash(id, name, price, count);
     }
 
     @Override
     public String toString() {
         return "Flower{" +
                 "id=" + id +
-                ", title='" + title + '\'' +
+                ", name='" + name + '\'' +
                 ", price=" + price +
                 ", count=" + count +
                 '}';

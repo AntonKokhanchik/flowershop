@@ -5,6 +5,8 @@ import flowershop.backend.enums.OrderStatus;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name="ORDERS")
@@ -18,9 +20,14 @@ public class OrderEntity {
     private LocalDateTime dateClosing;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+    @Column(name = "discount")
+    private Integer appliedDiscount;
     @ManyToOne
-    @JoinColumn(name="owner_login", referencedColumnName="login")
+    @JoinColumn(name = "owner_login", referencedColumnName = "login")
     private UserEntity owner;
+    @OneToMany(mappedBy = "order", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<OrderFlowerDataEntity> flowersData = new LinkedList<>();
+    ;
 
     public Long getId() {
         return id;
@@ -58,6 +65,14 @@ public class OrderEntity {
         return status;
     }
 
+    public Integer getAppliedDiscount() {
+        return appliedDiscount;
+    }
+
+    public void setAppliedDiscount(Integer appliedDiscount) {
+        this.appliedDiscount = appliedDiscount;
+    }
+
     public void setStatus(OrderStatus status) {
         this.status = status;
     }
@@ -70,14 +85,33 @@ public class OrderEntity {
         this.owner = owner;
     }
 
+    public List<OrderFlowerDataEntity> getFlowersData() {
+        return flowersData;
+    }
+
+    public void setFlowersData(List<OrderFlowerDataEntity> flowersData) {
+        this.flowersData = flowersData;
+    }
+
+    public void addFlowerData(OrderFlowerDataEntity d) {
+        flowersData.add(d);
+        d.setOrder(this);
+    }
+
+    public void removeFlowerData(OrderFlowerDataEntity d) {
+        d.setOrder(null);
+        flowersData.remove(d);
+    }
+
     @Override
     public String toString() {
-        return "Order{" +
+        return "OrderEntity{" +
                 "id=" + id +
                 ", fullPrice=" + fullPrice +
                 ", dateCreation=" + dateCreation +
                 ", dateClosing=" + dateClosing +
                 ", status=" + status +
+                ", appliedDiscount=" + appliedDiscount +
                 ", owner=" + owner +
                 '}';
     }

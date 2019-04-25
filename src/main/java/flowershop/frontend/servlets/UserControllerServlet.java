@@ -2,6 +2,7 @@ package flowershop.frontend.servlets;
 
 import flowershop.backend.dto.User;
 import flowershop.backend.enums.Path;
+import flowershop.backend.services.HTTPService;
 import flowershop.backend.services.UserService;
 import flowershop.backend.exception.UserValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class UserControllerServlet extends HttpServlet {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private HTTPService HTTPService;
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -33,14 +37,14 @@ public class UserControllerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Path path = Path.get(req.getRequestURI());
 
-        if (path == null){
+        if (path == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
             return;
         }
 
-        switch (path){
+        switch (path) {
             case USER_INDEX:
-                if (userService.isAccessGranted(req)) {
+                if (HTTPService.isAccessGranted(req)) {
                     req.setAttribute("users", userService.getAll());
                     break;
                 }
@@ -60,7 +64,7 @@ public class UserControllerServlet extends HttpServlet {
     }
 
     @Override
-    protected  void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Path path = Path.get(req.getRequestURI());
 
         if (path == null) {
@@ -68,7 +72,7 @@ public class UserControllerServlet extends HttpServlet {
             return;
         }
 
-        switch (path){
+        switch (path) {
             case LOGOUT:
                 req.getSession().removeAttribute("sessionUser");
                 resp.sendRedirect(req.getHeader("referer"));
@@ -76,8 +80,8 @@ public class UserControllerServlet extends HttpServlet {
 
             case REGISTER:
                 try {
-                    userService.create(userService.parse(req));
-                } catch (UserValidationException e){
+                    userService.create(HTTPService.parseUser(req));
+                } catch (UserValidationException e) {
                     handleValidationError(e, req);
 
                     req.getRequestDispatcher(path.getPage()).forward(req, resp);
@@ -90,8 +94,8 @@ public class UserControllerServlet extends HttpServlet {
             case LOGIN:
                 User user;
                 try {
-                    user = userService.verify(req);
-                }catch(UserValidationException e){
+                    user = userService.verify(HTTPService.parseUser(req));
+                } catch (UserValidationException e) {
                     handleValidationError(e, req);
 
                     req.getRequestDispatcher(path.getPage()).forward(req, resp);
@@ -108,7 +112,7 @@ public class UserControllerServlet extends HttpServlet {
         }
     }
 
-    private void handleValidationError(UserValidationException e, HttpServletRequest req){
+    private void handleValidationError(UserValidationException e, HttpServletRequest req) {
         String attrName = "anotherErrorMsg";
         switch (e.getMessage()) {
             case UserValidationException.WRONG_LOGIN:

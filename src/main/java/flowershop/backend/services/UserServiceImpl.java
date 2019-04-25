@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -92,31 +91,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User parse(HttpServletRequest req){
-        return new User(
-                req.getParameter("login"),
-                req.getParameter("password"),
-                req.getParameter("fullname"),
-                req.getParameter("address"),
-                req.getParameter("phone")
-        );
-    }
+    public User verify(User user) throws UserValidationException {
+        UserEntity userEntity = em.find(UserEntity.class, user.getLogin());
 
-    @Override
-    public User verify(HttpServletRequest req) throws UserValidationException {
-        String login = req.getParameter("login");
-        String password = req.getParameter("password");
-
-        UserEntity user = em.find(UserEntity.class, login);
-
-        if(user == null)
+        if(userEntity == null)
             throw new UserValidationException(UserValidationException.WRONG_LOGIN);
 
-        if (!password.equals(user.getPassword()))
+        if (!user.getPassword().equals(userEntity.getPassword()))
             throw new UserValidationException(UserValidationException.WRONG_PASSWORD);
 
-        LOG.info("User {} logged in", user);
-        return new User(user);
+        LOG.info("User {} logged in", userEntity);
+        return new User(userEntity);
     }
 
     @Override
@@ -131,13 +116,5 @@ public class UserServiceImpl implements UserService{
         } catch (IOException e) {
             LOG.error("Failed to convert to xml");
         }
-    }
-
-    @Override
-    public boolean isAccessGranted(HttpServletRequest req) {
-        User user = (User) req.getSession().getAttribute("sessionUser");
-        if (user != null && user.isAdmin())
-            return true;
-        return false;
     }
 }

@@ -23,22 +23,19 @@ import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-    private static final Logger LOG = LoggerFactory.getLogger(FlowerServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @PersistenceContext
     private EntityManager em;
 
     @PostConstruct
-    public void initialize()
-    {
+    public void initialize() {
         LOG.info("Order service on");
     }
 
     @Override
     @Transactional
     public void create(Order order) {
-        validate(order);
-
         order.setDateCreation(LocalDateTime.now());
         order.setDateClosing(null);
 
@@ -85,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void pay(Order order){
+    public void pay(Order order) {
         OrderEntity orderEntity = em.find(OrderEntity.class, order.getId());
         UserEntity owner = orderEntity.getOwner();
 
@@ -98,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void close(Order order){
+    public void close(Order order) {
         OrderEntity orderEntity = em.find(OrderEntity.class, order.getId());
 
         orderEntity.setStatus(OrderStatus.CLOSED);
@@ -124,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderEntity> entities = em.createNamedQuery("getAllOrders", OrderEntity.class).getResultList();
         List<Order> orders = new LinkedList<>();
 
-        for(OrderEntity e : entities)
+        for (OrderEntity e : entities)
             orders.add(new Order(e));
 
         return orders;
@@ -132,13 +129,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public List<Order> getByUser(User user){
+    public List<Order> getByUser(User user) {
         UserEntity entity = em.find(UserEntity.class, user.getLogin());
         List<OrderEntity> entities = entity.getOrders();
 
         List<Order> orders = new LinkedList<>();
 
-        for(OrderEntity e : entities)
+        for (OrderEntity e : entities)
             orders.add(new Order(e));
 
         return orders;
@@ -146,25 +143,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public List<OrderFlowerData> getFlowersData(Order order){
+    public List<OrderFlowerData> getFlowersData(Order order) {
         OrderEntity entity = em.find(OrderEntity.class, order.getId());
         List<OrderFlowerDataEntity> entities = entity.getFlowersData();
 
         List<OrderFlowerData> flowersData = new LinkedList<>();
 
-        for(OrderFlowerDataEntity e : entities)
+        for (OrderFlowerDataEntity e : entities)
             flowersData.add(new OrderFlowerData(e));
 
         return flowersData;
     }
 
     @Override
-    public void validate(Order order) {
-
-    }
-
-    @Override
-    public DetailedCart generateDetailedCart(Cart cart){
+    public DetailedCart generateDetailedCart(Cart cart) {
         Set<OrderFlowerData> items = new HashSet<>();
 
         for (Map.Entry<Long, Integer> entry : cart.items.entrySet())

@@ -3,6 +3,7 @@ package flowershop.frontend.servlets;
 import flowershop.backend.enums.Path;
 import flowershop.backend.services.FlowerService;
 import flowershop.backend.exception.FlowerValidationException;
+import flowershop.backend.services.HTTPService;
 import flowershop.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -24,6 +25,9 @@ public class FlowerControllerServlet extends HttpServlet {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private HTTPService HTTPService;
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -41,13 +45,13 @@ public class FlowerControllerServlet extends HttpServlet {
             return;
         }
 
-        switch (path){
+        switch (path) {
             case FLOWER_NEW:
             case FLOWER_UPDATE:
-                if (userService.isAccessGranted(req)) {
+                if (HTTPService.isAccessGranted(req)) {
                     req.setAttribute("action", path.getPath());
                     if (path == Path.FLOWER_UPDATE)
-                        req.setAttribute("flower", flowerService.find(getId(req)));
+                        req.setAttribute("flower", flowerService.find(HTTPService.getIdParam(req)));
                     break;
                 }
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -65,7 +69,7 @@ public class FlowerControllerServlet extends HttpServlet {
     }
 
     @Override
-    protected  void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Path path = Path.get(req.getRequestURI());
 
         if (path == null) {
@@ -73,15 +77,15 @@ public class FlowerControllerServlet extends HttpServlet {
             return;
         }
 
-        switch (path){
+        switch (path) {
             case FLOWER_NEW:
             case FLOWER_UPDATE:
-                if (userService.isAccessGranted(req)) {
+                if (HTTPService.isAccessGranted(req)) {
                     try {
                         if (path == Path.FLOWER_NEW)
-                            flowerService.create(flowerService.parse(req));
+                            flowerService.create(HTTPService.parseFlower(req));
                         else
-                            flowerService.update(flowerService.parse(req));
+                            flowerService.update(HTTPService.parseFlower(req));
                     } catch (FlowerValidationException e) {
                         handleValidationError(e, req);
 
@@ -96,8 +100,8 @@ public class FlowerControllerServlet extends HttpServlet {
                 return;
 
             case FLOWER_DELETE:
-                if (userService.isAccessGranted(req)) {
-                    Long id = getId(req);
+                if (HTTPService.isAccessGranted(req)) {
+                    Long id = HTTPService.getIdParam(req);
                     flowerService.delete(flowerService.find(id));
                     break;
                 }
@@ -129,9 +133,5 @@ public class FlowerControllerServlet extends HttpServlet {
         for (Map.Entry<String, String[]> p : req.getParameterMap().entrySet()) {
             req.setAttribute(p.getKey(), p.getValue()[0]);
         }
-    }
-
-    private Long getId(HttpServletRequest req){
-        return Long.parseLong(req.getPathInfo().split("/")[2]);
     }
 }

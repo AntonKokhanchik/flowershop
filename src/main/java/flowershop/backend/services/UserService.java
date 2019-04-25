@@ -3,7 +3,6 @@ package flowershop.backend.services;
 import flowershop.backend.dto.User;
 import flowershop.backend.exception.UserValidationException;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface UserService {
@@ -14,8 +13,6 @@ public interface UserService {
     List<User> getAll();
     void validate(User user);
     User getAdmin();
-    User parse(HttpServletRequest req);
-    User verify(HttpServletRequest req) throws UserValidationException;
+    User verify(User user) throws UserValidationException;
     void createXML(User user);
-    boolean isAccessGranted(HttpServletRequest req);
 }

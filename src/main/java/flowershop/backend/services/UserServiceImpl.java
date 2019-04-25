@@ -35,8 +35,6 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void create(User user) throws UserValidationException {
-        validate(user);
-
         user.setBalance(new BigDecimal(2000));
         user.setDiscount(0);
 
@@ -79,15 +77,6 @@ public class UserServiceImpl implements UserService{
             users.add(new User(e));
 
         return users;
-    }
-
-    @Override
-    public void validate(User user) {
-    }
-
-    @Override
-    public User getAdmin(){
-        return new User(em.find(UserEntity.class, "admin"));
     }
 
     @Override

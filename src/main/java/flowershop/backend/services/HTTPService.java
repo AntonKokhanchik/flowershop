@@ -28,13 +28,14 @@ public interface HTTPService {
     User parseUser(HttpServletRequest req);
 
     /**
-     * check session user on admin privileges
+     * Check session user for admin privileges
      * @param req http request
      * @return true if session user is admin
      */
     boolean isAccessGranted(HttpServletRequest req);
 
     /**
+     * Get id parameter from path similar to /controller/action/id
      * @param req http request
      * @return Long id path parameter
      */

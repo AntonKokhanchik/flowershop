@@ -35,17 +35,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void create(Order order) {
-        order.setDateCreation(LocalDateTime.now());
-        order.setDateClosing(null);
-
-        em.persist(order);
-
-        LOG.info("new order {} created", order);
-    }
-
-    @Override
-    @Transactional
     public void create(Cart cart, User user) throws FlowerValidationException {
         // decrease flowers count
         // TODO: здесь надо продумать изменение количества цветов между созданием корзины и созданием заказа

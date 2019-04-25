@@ -5,7 +5,13 @@ import flowershop.backend.dto.Flower;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Cart for holding flowers for order
+ */
 public class Cart {
+    /**
+     * items map {@code <flowerId, count>}
+     */
     Map<Long, Integer> items;
 
     public Cart() {
@@ -20,6 +26,10 @@ public class Cart {
         this.items = items;
     }
 
+    /**
+     * Add flower to cart, cannot (do nothing) add more than flowers count in shop
+     * @param flower flower to add
+     */
     public void addItem(Flower flower) {
         if (flower.getCount() < 1)
             return;
@@ -33,6 +43,10 @@ public class Cart {
         System.out.println(items);
     }
 
+    /**
+     * Remove flower from cart
+     * @param flower flower to remove
+     */
     public void removeItem(Flower flower) {
         Long flowerId = flower.getId();
         if (!items.containsKey(flowerId))

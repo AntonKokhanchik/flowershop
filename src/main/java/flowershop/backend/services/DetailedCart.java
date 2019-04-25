@@ -5,9 +5,11 @@ import flowershop.backend.dto.OrderFlowerData;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Cart with detailed information to show
+ */
 public class DetailedCart {
     Set<OrderFlowerData> items;
 
@@ -15,10 +17,11 @@ public class DetailedCart {
         this.items = items;
     }
 
-    public void clear() {
-        items = new HashSet<>();
-    }
-
+    /**
+     * Get summary price of all contained items
+     *
+     * @return sum(item.price)
+     */
     public BigDecimal getSum() {
         BigDecimal sum = new BigDecimal(BigInteger.ZERO);
         for (OrderFlowerData f : items)
@@ -26,6 +29,12 @@ public class DetailedCart {
         return sum;
     }
 
+    /**
+     * Get summary price include given discount
+     *
+     * @param discount discount to apply
+     * @return sum with discount
+     */
     public BigDecimal getResult(Integer discount) {
         return getSum().multiply(new BigDecimal(1 - discount / 100f)).setScale(2, RoundingMode.DOWN);
     }

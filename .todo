@@ -179,15 +179,15 @@ todo-list:
         (use Jquery.ajax to call rest service). Show user the information message if inputted
         login already exists. Register button should be disabled in that case.
 
-TODO[ ] Module 12 Activity:
-    [ ] Install Apache ActiveMQ 5.14.1 – open source messaging provider
+[x] Module 12 Activity:
+    [x] Install Apache ActiveMQ 5.14.1 – open source messaging provider
         http://activemq.apache.org/download.html
-    [ ] Run Apache ActiveMQ with <AMQ location>/bin\win64\activemq.bat
+    [x] Run Apache ActiveMQ with <AMQ location>/bin\win64\activemq.bat
         AMQ web interface url: http://localhost:8161/admin/
         Login/Password: admin/admin
-    [ ] Create 2 queues: IN_QUEUE, OUT_QUEUE
-    [ ] Integrate ActiveMQ with Tomcat
-          [ ] а) context.xml
+    [x] Create 2 queues: IN_QUEUE, OUT_QUEUE
+    [x] Integrate ActiveMQ with Tomcat
+          [x] а) context.xml
                 <Resource name="jms/connectionFactory" auth="Container"
                           type="org.apache.activemq.ActiveMQConnectionFactory"
                           factory="org.apache.activemq.jndi.JNDIReferenceFactory"
@@ -196,7 +196,7 @@ TODO[ ] Module 12 Activity:
                           type="org.apache.activemq.command.ActiveMQQueue"
                           factory="org.apache.activemq.jndi.JNDIReferenceFactory"
                           physicalName="OUT_QUEUE"/>
-         [ ] b) Put activemq-client-5.14.1.jar to <Tomcat folder>/lib
-    [ ] Implement Flower shop application integration with FlowersGlobal CRM:
-        [ ] а) send xml representation of customer entity to out queue when new customer registers
-    	[ ] b) receive new discount request object (customerId, newDiscount) in XML format to change customers discount
+         [x] b) Put activemq-client-5.14.1.jar to <Tomcat folder>/lib
+    [x] Implement Flower shop application integration with FlowersGlobal CRM:
+        [x] а) send xml representation of customer entity to out queue when new customer registers
+    	[x] b) receive new discount request object (customerId, newDiscount) in XML format to change customers discount

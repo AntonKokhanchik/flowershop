@@ -77,4 +77,8 @@
     <bean id="FlowersStockImpl" class="flowershop.webService.FlowersStockServiceImpl" />
     <!-- JAX-WS endpoint bean which is picked up by CXF -->
     <jaxws:endpoint id="FlowersStock" implementor="#FlowersStockImpl" address="/FlowersStock"/>
+
+    <jee:jndi-lookup id="connectionFactory" jndi-name="jms/connectionFactory"/>
+    <jee:jndi-lookup id="sendNewUsersXmlQueue" jndi-name="jms/outQueue"/>
+    <jee:jndi-lookup id="receiveUserDiscountXmlQueue" jndi-name="jms/inQueue"/>
 </beans>

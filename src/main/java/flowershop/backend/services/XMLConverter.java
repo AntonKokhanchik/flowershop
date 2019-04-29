@@ -6,9 +6,7 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 @Component
 public class XMLConverter {
@@ -35,6 +33,20 @@ public class XMLConverter {
             throws IOException {
         FileOutputStream os = new FileOutputStream(filepath);
         getMarshaller().marshal(object, new StreamResult(os));
+    }
+
+    public String convertFromObjectToXMLString(Object object)
+            throws IOException {
+        StringWriter sw = new StringWriter();
+        getMarshaller().marshal(object, new StreamResult(sw));
+
+       return sw.toString();
+    }
+
+    public Object convertFromXMLStringToObject(String string)
+            throws IOException {
+        StringReader sr = new StringReader(string);
+        return getUnmarshaller().unmarshal(new StreamSource(sr));
     }
 
     public Object convertFromXMLToObject(String xmlfile) throws IOException {

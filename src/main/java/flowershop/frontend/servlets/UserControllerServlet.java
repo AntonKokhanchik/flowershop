@@ -3,6 +3,7 @@ package flowershop.frontend.servlets;
 import flowershop.backend.dto.User;
 import flowershop.backend.enums.Path;
 import flowershop.backend.services.HTTPService;
+import flowershop.backend.services.JmsMessageService;
 import flowershop.backend.services.UserService;
 import flowershop.backend.exception.UserValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class UserControllerServlet extends HttpServlet {
 
     @Autowired
     private HTTPService HTTPService;
+
+    @Autowired
+    private JmsMessageService jmsMessageService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -80,14 +84,16 @@ public class UserControllerServlet extends HttpServlet {
 
             case REGISTER:
                 try {
-                    userService.create(HTTPService.parseUser(req));
+                    User user = HTTPService.parseUser(req);
+                    userService.create(user);
+
+                    jmsMessageService.SendNewUserSql(user);
                 } catch (UserValidationException e) {
                     handleValidationError(e, req);
 
                     req.getRequestDispatcher(path.getPage()).forward(req, resp);
                     return;
                 }
-
                 resp.sendRedirect(Path.LOGIN.getPath());
                 return;
 

@@ -1,5 +1,6 @@
 package flowershop.backend.services;
 
+import flowershop.backend.dao.UserDAO;
 import flowershop.backend.dto.User;
 import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.UserValidationException;
@@ -7,11 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -24,8 +22,11 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private XMLConverter converter;
 
-    @PersistenceContext
-    private EntityManager em;
+    @Autowired
+    private JmsMessageService jmsMessageService;
+
+    @Autowired
+    private UserDAO userDAO;
 
     @PostConstruct
     public void init(){
@@ -33,21 +34,19 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
     public void create(User user) throws UserValidationException {
         user.setBalance(new BigDecimal(2000));
         user.setDiscount(0);
 
-        em.persist(user.toEntity());
+        userDAO.create(user.toEntity());
 
-        LOG.info("New user {} registeded", user);
         createXML(user);
+        jmsMessageService.SendNewUserSql(user);
     }
 
     @Override
-    @Transactional
     public void update(User user) {
-        UserEntity userEntity = em.find(UserEntity.class, user.getLogin());
+        UserEntity userEntity = userDAO.find(user.getLogin());
 
         userEntity.setPassword(user.getPassword());
         userEntity.setFullName(user.getFullName());
@@ -55,22 +54,23 @@ public class UserServiceImpl implements UserService{
         userEntity.setPhone(user.getPhone());
         userEntity.setDiscount(user.getDiscount());
         userEntity.setBalance(user.getBalance());
+
+        userDAO.update(userEntity);
     }
 
     @Override
-    @Transactional
     public void delete(User user) {
-        em.remove(em.find(UserEntity.class, user.getLogin()));
+        userDAO.delete(user.toEntity());
     }
 
     @Override
     public User find(String login) {
-        return new User(em.find(UserEntity.class, login));
+        return new User(userDAO.find(login));
     }
 
     @Override
     public List<User> getAll() {
-        List<UserEntity> entities = em.createNamedQuery("getAllUsers", UserEntity.class).getResultList();
+        List<UserEntity> entities = userDAO.getAll();
         List<User> users = new LinkedList<>();
 
         for(UserEntity e : entities)
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User verify(User user) throws UserValidationException {
-        UserEntity userEntity = em.find(UserEntity.class, user.getLogin());
+        UserEntity userEntity = userDAO.find(user.getLogin());
 
         if(userEntity == null)
             throw new UserValidationException(UserValidationException.WRONG_LOGIN);
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService{
         if (!user.getPassword().equals(userEntity.getPassword()))
             throw new UserValidationException(UserValidationException.WRONG_PASSWORD);
 
-        LOG.info("User {} logged in", userEntity);
+        LOG.info("User logged in: {}", userEntity);
         return new User(userEntity);
     }
 
@@ -104,6 +104,7 @@ public class UserServiceImpl implements UserService{
 //            LOG.info("if convert back will be " + user);
         } catch (IOException e) {
             LOG.error("Failed to convert to xml");
+            e.printStackTrace();
         }
     }
 }

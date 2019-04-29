@@ -1,9 +1,10 @@
 package flowershop.frontend.servlets;
 
+import flowershop.backend.dto.Flower;
+import flowershop.backend.dto.User;
 import flowershop.backend.enums.Path;
 import flowershop.backend.services.FlowerService;
 import flowershop.backend.exception.FlowerValidationException;
-import flowershop.backend.services.HTTPService;
 import flowershop.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Map;
 
 @WebServlet(urlPatterns = {"/", "/flower/*"})
@@ -25,8 +27,6 @@ public class FlowerControllerServlet extends HttpServlet {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private HTTPService HTTPService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -38,6 +38,8 @@ public class FlowerControllerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        refreshSessionUser(req);
+
         Path path = Path.get(req.getRequestURI());
 
         if (path == null) {
@@ -48,10 +50,10 @@ public class FlowerControllerServlet extends HttpServlet {
         switch (path) {
             case FLOWER_NEW:
             case FLOWER_UPDATE:
-                if (HTTPService.isAccessGranted(req)) {
+                if (isAccessGranted(req)) {
                     req.setAttribute("action", path.getPath());
                     if (path == Path.FLOWER_UPDATE)
-                        req.setAttribute("flower", flowerService.find(HTTPService.getIdParam(req)));
+                        req.setAttribute("flower", flowerService.find(getIdParam(req)));
                     break;
                 }
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -80,12 +82,12 @@ public class FlowerControllerServlet extends HttpServlet {
         switch (path) {
             case FLOWER_NEW:
             case FLOWER_UPDATE:
-                if (HTTPService.isAccessGranted(req)) {
+                if (isAccessGranted(req)) {
                     try {
                         if (path == Path.FLOWER_NEW)
-                            flowerService.create(HTTPService.parseFlower(req));
+                            flowerService.create(parseFlower(req));
                         else
-                            flowerService.update(HTTPService.parseFlower(req));
+                            flowerService.update(parseFlower(req));
                     } catch (FlowerValidationException e) {
                         handleValidationError(e, req);
 
@@ -100,8 +102,8 @@ public class FlowerControllerServlet extends HttpServlet {
                 return;
 
             case FLOWER_DELETE:
-                if (HTTPService.isAccessGranted(req)) {
-                    Long id = HTTPService.getIdParam(req);
+                if (isAccessGranted(req)) {
+                    Long id = getIdParam(req);
                     flowerService.delete(flowerService.find(id));
                     break;
                 }
@@ -133,5 +135,52 @@ public class FlowerControllerServlet extends HttpServlet {
         for (Map.Entry<String, String[]> p : req.getParameterMap().entrySet()) {
             req.setAttribute(p.getKey(), p.getValue()[0]);
         }
+    }
+
+    public Flower parseFlower(HttpServletRequest req) throws FlowerValidationException {
+        // parse id
+        String parameter = req.getParameter("id");
+        Long id = (parameter == null || parameter.equals("")) ? null : Long.parseLong(parameter);
+
+        // parse name
+        String name = req.getParameter("name");
+
+        // parse price
+        BigDecimal price;
+        try {
+            price = new BigDecimal(req.getParameter("price"));
+        } catch (NumberFormatException e) {
+            throw new FlowerValidationException(FlowerValidationException.WRONG_PRICE);
+        }
+
+        // parse count
+        parameter = req.getParameter("count");
+        if (parameter.equals(""))
+            parameter = "0";
+        Integer count;
+        try {
+            count = Integer.parseInt(parameter);
+        } catch (NumberFormatException e) {
+            throw new FlowerValidationException(FlowerValidationException.WRONG_COUNT);
+        }
+
+        return new Flower(id, name, price, count);
+    }
+
+
+
+    public boolean isAccessGranted(HttpServletRequest req) {
+        User user = (User) req.getSession().getAttribute("sessionUser");
+        return (user != null && user.isAdmin());
+    }
+
+    public Long getIdParam(HttpServletRequest req){
+        return Long.parseLong(req.getPathInfo().split("/")[2]);
+    }
+
+    public void refreshSessionUser(HttpServletRequest req){
+        User sessionUser = (User) req.getSession().getAttribute("sessionUser");
+        sessionUser = sessionUser == null ? null : userService.find(sessionUser.getLogin());
+        req.getSession().setAttribute("sessionUser", sessionUser);
     }
 }

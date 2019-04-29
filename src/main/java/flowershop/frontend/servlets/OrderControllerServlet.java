@@ -3,8 +3,11 @@ package flowershop.frontend.servlets;
 import flowershop.backend.dto.Order;
 import flowershop.backend.dto.User;
 import flowershop.backend.enums.Path;
-import flowershop.backend.services.*;
 import flowershop.backend.exception.FlowerValidationException;
+import flowershop.backend.services.Cart;
+import flowershop.backend.services.FlowerService;
+import flowershop.backend.services.OrderService;
+import flowershop.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
@@ -24,8 +27,6 @@ public class OrderControllerServlet extends HttpServlet {
     private FlowerService flowerService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private HTTPService HTTPService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -37,6 +38,8 @@ public class OrderControllerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        refreshSessionUser(req);
+
         Path path = Path.get(req.getRequestURI());
 
         if (path == null) {
@@ -57,7 +60,7 @@ public class OrderControllerServlet extends HttpServlet {
                 break;
 
             case ORDER_SHOW:
-                Order order = orderService.find(HTTPService.getIdParam(req));
+                Order order = orderService.find(getIdParam(req));
                 req.setAttribute("order", order);
                 req.setAttribute("items", orderService.getFlowersData(order));
                 break;
@@ -99,7 +102,7 @@ public class OrderControllerServlet extends HttpServlet {
                 Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
                 if (cart == null)
                     cart = new Cart();
-                Long flowerId = HTTPService.getIdParam(req);
+                Long flowerId = getIdParam(req);
 
                 cart.addItem(flowerService.find(flowerId));
 
@@ -112,7 +115,7 @@ public class OrderControllerServlet extends HttpServlet {
 
             case REMOVE_FROM_CART: {
                 Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
-                Long id = HTTPService.getIdParam(req);
+                Long id = getIdParam(req);
 
                 cart.removeItem(flowerService.find(id));
 
@@ -124,7 +127,7 @@ public class OrderControllerServlet extends HttpServlet {
 
             case ORDER_PAY: {
                 User user = (User) req.getSession().getAttribute("sessionUser");
-                Order order = orderService.find(HTTPService.getIdParam(req));
+                Order order = orderService.find(getIdParam(req));
 
                 if (user.getLogin().equals(order.getOwner().getLogin()))
                     if (user.getBalance().compareTo(order.getFullPrice()) >= 0) {
@@ -137,8 +140,8 @@ public class OrderControllerServlet extends HttpServlet {
             }
 
             case ORDER_CLOSE: {
-                if (HTTPService.isAccessGranted(req)) {
-                    Order order = orderService.find(HTTPService.getIdParam(req));
+                if (isAccessGranted(req)) {
+                    Order order = orderService.find(getIdParam(req));
                     orderService.close(order);
 
                     resp.sendRedirect(Path.ORDER_INDEX.getPath());
@@ -149,8 +152,8 @@ public class OrderControllerServlet extends HttpServlet {
             }
 
             case ORDER_DELETE:
-                if (HTTPService.isAccessGranted(req)) {
-                    Long id = HTTPService.getIdParam(req);
+                if (isAccessGranted(req)) {
+                    Long id = getIdParam(req);
                     orderService.delete(orderService.find(id));
 
                     resp.sendRedirect(Path.ORDER_INDEX.getPath());
@@ -163,5 +166,20 @@ public class OrderControllerServlet extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
+    }
+
+    public boolean isAccessGranted(HttpServletRequest req) {
+        User user = (User) req.getSession().getAttribute("sessionUser");
+        return (user != null && user.isAdmin());
+    }
+
+    private Long getIdParam(HttpServletRequest req){
+        return Long.parseLong(req.getPathInfo().split("/")[2]);
+    }
+
+    public void refreshSessionUser(HttpServletRequest req){
+        User sessionUser = (User) req.getSession().getAttribute("sessionUser");
+        sessionUser = sessionUser == null ? null : userService.find(sessionUser.getLogin());
+        req.getSession().setAttribute("sessionUser", sessionUser);
     }
 }

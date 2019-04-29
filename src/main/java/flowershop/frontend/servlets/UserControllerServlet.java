@@ -2,8 +2,6 @@ package flowershop.frontend.servlets;
 
 import flowershop.backend.dto.User;
 import flowershop.backend.enums.Path;
-import flowershop.backend.services.HTTPService;
-import flowershop.backend.services.JmsMessageService;
 import flowershop.backend.services.UserService;
 import flowershop.backend.exception.UserValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +21,6 @@ public class UserControllerServlet extends HttpServlet {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private HTTPService HTTPService;
-
-    @Autowired
-    private JmsMessageService jmsMessageService;
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -39,6 +31,8 @@ public class UserControllerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        refreshSessionUser(req);
+
         Path path = Path.get(req.getRequestURI());
 
         if (path == null) {
@@ -48,7 +42,7 @@ public class UserControllerServlet extends HttpServlet {
 
         switch (path) {
             case USER_INDEX:
-                if (HTTPService.isAccessGranted(req)) {
+                if (isAccessGranted(req)) {
                     req.setAttribute("users", userService.getAll());
                     break;
                 }
@@ -84,10 +78,8 @@ public class UserControllerServlet extends HttpServlet {
 
             case REGISTER:
                 try {
-                    User user = HTTPService.parseUser(req);
+                    User user = parseUser(req);
                     userService.create(user);
-
-                    jmsMessageService.SendNewUserSql(user);
                 } catch (UserValidationException e) {
                     handleValidationError(e, req);
 
@@ -100,7 +92,7 @@ public class UserControllerServlet extends HttpServlet {
             case LOGIN:
                 User user;
                 try {
-                    user = userService.verify(HTTPService.parseUser(req));
+                    user = userService.verify(parseUser(req));
                 } catch (UserValidationException e) {
                     handleValidationError(e, req);
 
@@ -134,5 +126,26 @@ public class UserControllerServlet extends HttpServlet {
         for (Map.Entry<String, String[]> p : req.getParameterMap().entrySet()) {
             req.setAttribute(p.getKey(), p.getValue()[0]);
         }
+    }
+
+    private User parseUser(HttpServletRequest req){
+        return new User(
+                req.getParameter("login"),
+                req.getParameter("password"),
+                req.getParameter("fullname"),
+                req.getParameter("address"),
+                req.getParameter("phone")
+        );
+    }
+
+    public boolean isAccessGranted(HttpServletRequest req) {
+        User user = (User) req.getSession().getAttribute("sessionUser");
+        return (user != null && user.isAdmin());
+    }
+
+    public void refreshSessionUser(HttpServletRequest req){
+        User sessionUser = (User) req.getSession().getAttribute("sessionUser");
+        sessionUser = sessionUser == null ? null : userService.find(sessionUser.getLogin());
+        req.getSession().setAttribute("sessionUser", sessionUser);
     }
 }

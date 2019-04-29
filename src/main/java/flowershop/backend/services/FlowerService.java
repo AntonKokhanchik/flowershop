@@ -1,6 +1,7 @@
 package flowershop.backend.services;
 
 import flowershop.backend.dto.Flower;
+import flowershop.backend.exception.FlowerValidationException;
 
 import java.util.List;
 
@@ -14,14 +15,14 @@ public interface FlowerService {
      *
      * @param flower flower to add
      */
-    void create(Flower flower);
+    void create(Flower flower) throws FlowerValidationException;
 
     /**
      * Update corresponding flower object in database
      *
      * @param flower flower to update
      */
-    void update(Flower flower);
+    void update(Flower flower) throws FlowerValidationException;
 
     /**
      * Delete corresponding flower object from database

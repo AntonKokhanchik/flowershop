@@ -11,7 +11,7 @@ import java.util.Set;
  * Cart with detailed information to show
  */
 public class DetailedCart {
-    Set<OrderFlowerData> items;
+    private Set<OrderFlowerData> items;
 
     public DetailedCart(Set<OrderFlowerData> items) {
         this.items = items;

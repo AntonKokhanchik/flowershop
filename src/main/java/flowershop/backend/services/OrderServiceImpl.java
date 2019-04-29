@@ -1,5 +1,8 @@
 package flowershop.backend.services;
 
+import flowershop.backend.dao.FlowerDAO;
+import flowershop.backend.dao.OrderDAO;
+import flowershop.backend.dao.UserDAO;
 import flowershop.backend.dto.Flower;
 import flowershop.backend.dto.OrderFlowerData;
 import flowershop.backend.entity.FlowerEntity;
@@ -12,12 +15,11 @@ import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.FlowerValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -25,8 +27,12 @@ import java.util.*;
 public class OrderServiceImpl implements OrderService {
     private static final Logger LOG = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-    @PersistenceContext
-    private EntityManager em;
+    @Autowired
+    private OrderDAO orderDAO;
+    @Autowired
+    private FlowerDAO flowerDAO;
+    @Autowired
+    private UserDAO userDAO;
 
     @PostConstruct
     public void initialize() {
@@ -38,12 +44,13 @@ public class OrderServiceImpl implements OrderService {
     public void create(Cart cart, User user) throws FlowerValidationException {
         // decrease flowers count
         // TODO: здесь надо продумать изменение количества цветов между созданием корзины и созданием заказа
-        for (Map.Entry<Long, Integer> item : cart.items.entrySet()) {
-            FlowerEntity flower = em.find(FlowerEntity.class, item.getKey());
+        for (Map.Entry<Long, Integer> item : cart.getItems().entrySet()) {
+            FlowerEntity flower = flowerDAO.find(item.getKey());
             flower.setCount(flower.getCount() - item.getValue());
 
             if (flower.getCount() < 0)
                 throw new FlowerValidationException(FlowerValidationException.NOT_ENOUGH_FLOWERS);
+            flowerDAO.update(flower);
         }
 
         DetailedCart detailedCart = generateDetailedCart(cart);
@@ -53,61 +60,55 @@ public class OrderServiceImpl implements OrderService {
                 LocalDateTime.now(), null, OrderStatus.CREATED, user.getDiscount()).toEntity();
 
         // add flower data
-        for (OrderFlowerData f : detailedCart.items) {
+        for (OrderFlowerData f : detailedCart.getItems()) {
             OrderFlowerDataEntity fe = f.toEntity();
-            em.persist(fe);
             order.addFlowerData(fe);
         }
 
         // set owner
-        UserEntity userEntity = em.find(UserEntity.class, user.getLogin());
+        UserEntity userEntity = userDAO.find(user.getLogin());
         order.setOwner(userEntity);
 
         // save
-        em.persist(order);
-
-        LOG.info("new order {} created", order);
+        orderDAO.create(order);
     }
 
     @Override
-    @Transactional
     public void pay(Order order) {
-        OrderEntity orderEntity = em.find(OrderEntity.class, order.getId());
+        OrderEntity orderEntity = orderDAO.find(order.getId());
         UserEntity owner = orderEntity.getOwner();
 
         owner.setBalance(owner.getBalance().subtract(orderEntity.getFullPrice()));
+        userDAO.update(owner);
 
         orderEntity.setStatus(OrderStatus.PAID);
+        orderDAO.update(orderEntity);
 
         LOG.info("Order {} paid", order);
     }
 
     @Override
-    @Transactional
     public void close(Order order) {
-        OrderEntity orderEntity = em.find(OrderEntity.class, order.getId());
+        OrderEntity orderEntity = orderDAO.find(order.getId());
 
         orderEntity.setStatus(OrderStatus.CLOSED);
         orderEntity.setDateClosing(LocalDateTime.now());
-
-        LOG.info("new order {} closed", order);
+        orderDAO.update(orderEntity);
     }
 
     @Override
-    @Transactional
     public void delete(Order order) {
-        em.remove(em.find(OrderEntity.class, order.getId()));
-        LOG.info("new order {} deleted", order);
+        orderDAO.delete(order.toEntity());
     }
 
     @Override
     public Order find(Long id) {
-        return new Order(em.find(OrderEntity.class, id));
+        return new Order(orderDAO.find(id));
     }
 
     @Override
     public List<Order> getAll() {
-        List<OrderEntity> entities = em.createNamedQuery("getAllOrders", OrderEntity.class).getResultList();
+        List<OrderEntity> entities = orderDAO.getAll();
         List<Order> orders = new LinkedList<>();
 
         for (OrderEntity e : entities)
@@ -119,8 +120,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public List<Order> getByUser(User user) {
-        UserEntity entity = em.find(UserEntity.class, user.getLogin());
-        List<OrderEntity> entities = entity.getOrders();
+        UserEntity userEntity = userDAO.find(user.getLogin());
+        List<OrderEntity> entities = userEntity.getOrders();
 
         List<Order> orders = new LinkedList<>();
 
@@ -133,7 +134,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public List<OrderFlowerData> getFlowersData(Order order) {
-        OrderEntity entity = em.find(OrderEntity.class, order.getId());
+        OrderEntity entity = orderDAO.find(order.getId());
         List<OrderFlowerDataEntity> entities = entity.getFlowersData();
 
         List<OrderFlowerData> flowersData = new LinkedList<>();
@@ -148,8 +149,8 @@ public class OrderServiceImpl implements OrderService {
     public DetailedCart generateDetailedCart(Cart cart) {
         Set<OrderFlowerData> items = new HashSet<>();
 
-        for (Map.Entry<Long, Integer> entry : cart.items.entrySet())
-            items.add(new Flower(em.find(FlowerEntity.class, entry.getKey())).toOrderData(entry.getValue()));
+        for (Map.Entry<Long, Integer> entry : cart.getItems().entrySet())
+            items.add(new Flower(flowerDAO.find(entry.getKey())).toOrderData(entry.getValue()));
 
         return new DetailedCart(items);
     }

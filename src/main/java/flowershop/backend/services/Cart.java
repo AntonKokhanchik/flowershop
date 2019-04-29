@@ -12,7 +12,7 @@ public class Cart {
     /**
      * items map {@code <flowerId, count>}
      */
-    Map<Long, Integer> items;
+    private Map<Long, Integer> items;
 
     public Cart() {
         items = new HashMap<>();
@@ -40,7 +40,6 @@ public class Cart {
                 items.put(flowerId, items.get(flowerId) + 1);
         } else
             items.put(flowerId, 1);
-        System.out.println(items);
     }
 
     /**

@@ -67,7 +67,7 @@ public class FlowerServiceImpl implements FlowerService {
 
         if (flower.getPrice() == null)
             flower.setPrice(BigDecimal.ZERO);
-        if(flower.getPrice().compareTo(BigDecimal.ZERO) < 0)
+        if (flower.getPrice().compareTo(BigDecimal.ZERO) < 0)
             throw new FlowerValidationException(FlowerValidationException.NEGATIVE_PRICE);
 
         if (flower.getCount() == null)

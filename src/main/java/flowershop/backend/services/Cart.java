@@ -2,17 +2,18 @@ package flowershop.backend.services;
 
 import flowershop.backend.dto.Flower;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Cart for holding flowers for order
  */
-public class Cart {
+public class Cart implements Serializable {
     /**
      * items map {@code <flowerId, count>}
      */
-    private Map<Long, Integer> items;
+    private HashMap<Long, Integer> items;
 
     public Cart() {
         items = new HashMap<>();
@@ -23,7 +24,7 @@ public class Cart {
     }
 
     public void setItems(Map<Long, Integer> items) {
-        this.items = items;
+        this.items = (HashMap) items;
     }
 
     /**

@@ -3,15 +3,16 @@ package flowershop.backend.entity;
 import flowershop.backend.enums.OrderStatus;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
 @Entity
-@Table(name="ORDERS")
-@NamedQuery(name="getAllOrders", query="Select c from OrderEntity c")
-public class OrderEntity {
+@Table(name = "ORDERS")
+@NamedQuery(name = "getAllOrders", query = "Select c from OrderEntity c")
+public class OrderEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +28,6 @@ public class OrderEntity {
     private UserEntity owner;
     @OneToMany(mappedBy = "order", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<OrderFlowerDataEntity> flowersData = new LinkedList<>();
-    ;
 
     public Long getId() {
         return id;

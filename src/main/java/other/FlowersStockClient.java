@@ -11,14 +11,15 @@ public class FlowersStockClient {
     private static String flowersStockServiceUrl = "http://localhost:8080/ws/FlowersStock";
 
     public static void main(String[] args) {
-        while (true) {
+        int i = 0;
+        while (i < 50) {
+            i++;
             try {
                 // random([10,30])
                 sendRequestIncreaseFlowersStock((int) (Math.random() * 21 + 10));
                 // 10 sec
-                Thread.sleep(10*1000);
-                // 10 min
-                // Thread.sleep(60*10*1000);
+                Thread.sleep(10 * 1000L);
+                // 10 min - *60
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -38,15 +39,14 @@ public class FlowersStockClient {
 
         //read response
         BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        System.out.println(conn.getResponseCode());
 
         String str;
-        while ((str = br.readLine())!=null){
+        while ((str = br.readLine())!= null) {
             System.out.println(str);
         }
     }
 
-    private static String generateIncreaseFlowersStockSoapXML(int count){
+    private static String generateIncreaseFlowersStockSoapXML(int count) {
         // подглядел у SoapUI
         return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://webService.flowershop/\">\n" +
                "   <soapenv:Header/>\n" +

@@ -1,6 +1,7 @@
 package flowershop.frontend.servlets;
 
 import flowershop.backend.dto.User;
+import flowershop.backend.enums.SessionAttribute;
 import flowershop.backend.enums.Path;
 import flowershop.backend.services.UserService;
 import flowershop.backend.exception.UserValidationException;
@@ -72,10 +73,10 @@ public class UserControllerServlet extends HttpServlet {
 
         switch (path) {
             case LOGOUT:
-                req.getSession().removeAttribute("sessionUser");
-                req.getSession().removeAttribute("sessionCart");
-                req.getSession().removeAttribute("sessionDetailedCart");
-                resp.sendRedirect(Path.LOGIN.getPath());
+                req.getSession().removeAttribute(SessionAttribute.USER.getValue());
+                req.getSession().removeAttribute(SessionAttribute.CART.getValue());
+                req.getSession().removeAttribute(SessionAttribute.DETAILED_CART.getValue());
+                resp.sendRedirect(Path.LOGIN.getValue());
                 return;
 
             case REGISTER:
@@ -88,7 +89,7 @@ public class UserControllerServlet extends HttpServlet {
                     req.getRequestDispatcher(path.getPage()).forward(req, resp);
                     return;
                 }
-                resp.sendRedirect(Path.LOGIN.getPath());
+                resp.sendRedirect(Path.LOGIN.getValue());
                 return;
 
             case LOGIN:
@@ -102,8 +103,8 @@ public class UserControllerServlet extends HttpServlet {
                     return;
                 }
 
-                req.getSession().setAttribute("sessionUser", user);
-                resp.sendRedirect(Path.FLOWER_INDEX.getPath());
+                req.getSession().setAttribute(SessionAttribute.USER.getValue(), user);
+                resp.sendRedirect(Path.FLOWER_INDEX.getValue());
                 return;
 
             default:
@@ -113,7 +114,7 @@ public class UserControllerServlet extends HttpServlet {
     }
 
     private void handleValidationError(UserValidationException e, HttpServletRequest req) {
-        String attrName = "anotherErrorMsg";
+        String attrName;
         switch (e.getMessage()) {
             case UserValidationException.WRONG_LOGIN:
                 attrName = "loginErrorMsg";
@@ -121,6 +122,8 @@ public class UserControllerServlet extends HttpServlet {
             case UserValidationException.WRONG_PASSWORD:
                 attrName = "passwordErrorMsg";
                 break;
+            default:
+                attrName = "anotherErrorMsg";
         }
         req.setAttribute(attrName, e.getMessage());
 
@@ -140,14 +143,14 @@ public class UserControllerServlet extends HttpServlet {
         );
     }
 
-    public boolean isAccessGranted(HttpServletRequest req) {
-        User user = (User) req.getSession().getAttribute("sessionUser");
+    private boolean isAccessGranted(HttpServletRequest req) {
+        User user = (User) req.getSession().getAttribute(SessionAttribute.USER.getValue());
         return (user != null && user.isAdmin());
     }
 
-    public void refreshSessionUser(HttpServletRequest req){
-        User sessionUser = (User) req.getSession().getAttribute("sessionUser");
+    private void refreshSessionUser(HttpServletRequest req){
+        User sessionUser = (User) req.getSession().getAttribute(SessionAttribute.USER.getValue());
         sessionUser = sessionUser == null ? null : userService.find(sessionUser.getLogin());
-        req.getSession().setAttribute("sessionUser", sessionUser);
+        req.getSession().setAttribute(SessionAttribute.USER.getValue(), sessionUser);
     }
 }

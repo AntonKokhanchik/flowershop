@@ -1,12 +1,13 @@
 package flowershop.backend.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name="FLOWERS")
-@NamedQuery(name="getAllFlowers", query="Select c from FlowerEntity c")
-public class FlowerEntity {
+@Table(name = "FLOWERS")
+@NamedQuery(name = "getAllFlowers", query = "Select c from FlowerEntity c")
+public class FlowerEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

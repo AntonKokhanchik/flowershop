@@ -1,14 +1,15 @@
 package flowershop.backend.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
 @Entity
-@Table(name="USERS")
-@NamedQuery(name="getAllUsers", query="Select c from UserEntity c")
-public class UserEntity {
+@Table(name = "USERS")
+@NamedQuery(name = "getAllUsers", query = "Select c from UserEntity c")
+public class UserEntity implements Serializable {
     @Id
     private String login;
     private String password;

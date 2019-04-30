@@ -1,6 +1,7 @@
 package flowershop.backend.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -11,8 +12,8 @@ import java.math.BigDecimal;
  * а также количество заказанных цветков данного вида
  */
 @Entity
-@Table(name="ORDER_FLOWERS")
-public class OrderFlowerDataEntity {
+@Table(name = "ORDER_FLOWERS")
+public class OrderFlowerDataEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

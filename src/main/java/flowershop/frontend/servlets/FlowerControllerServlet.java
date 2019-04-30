@@ -2,6 +2,7 @@ package flowershop.frontend.servlets;
 
 import flowershop.backend.dto.Flower;
 import flowershop.backend.dto.User;
+import flowershop.backend.enums.SessionAttribute;
 import flowershop.backend.enums.Path;
 import flowershop.backend.services.FlowerService;
 import flowershop.backend.exception.FlowerValidationException;
@@ -51,7 +52,7 @@ public class FlowerControllerServlet extends HttpServlet {
             case FLOWER_NEW:
             case FLOWER_UPDATE:
                 if (isAccessGranted(req)) {
-                    req.setAttribute("action", path.getPath());
+                    req.setAttribute("action", path.getValue());
                     if (path == Path.FLOWER_UPDATE)
                         req.setAttribute("flower", flowerService.find(getIdParam(req)));
                     break;
@@ -91,7 +92,7 @@ public class FlowerControllerServlet extends HttpServlet {
                     } catch (FlowerValidationException e) {
                         handleValidationError(e, req);
 
-                        req.setAttribute("action", path.getPath());
+                        req.setAttribute("action", path.getValue());
 
                         req.getRequestDispatcher(path.getPage()).forward(req, resp);
                         return;
@@ -114,11 +115,11 @@ public class FlowerControllerServlet extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
                 return;
         }
-        resp.sendRedirect(Path.FLOWER_INDEX.getPath());
+        resp.sendRedirect(Path.FLOWER_INDEX.getValue());
     }
 
     private void handleValidationError(FlowerValidationException e, HttpServletRequest req) {
-        String attrName = "anotherErrorMsg";
+        String attrName;
         switch (e.getMessage()) {
             case FlowerValidationException.NEGATIVE_COUNT:
             case FlowerValidationException.WRONG_COUNT:
@@ -128,6 +129,8 @@ public class FlowerControllerServlet extends HttpServlet {
             case FlowerValidationException.WRONG_PRICE:
                 attrName = "priceErrorMsg";
                 break;
+            default:
+                attrName = "anotherErrorMsg";
         }
         req.setAttribute(attrName, e.getMessage());
 
@@ -169,18 +172,18 @@ public class FlowerControllerServlet extends HttpServlet {
 
 
 
-    public boolean isAccessGranted(HttpServletRequest req) {
-        User user = (User) req.getSession().getAttribute("sessionUser");
+    private boolean isAccessGranted(HttpServletRequest req) {
+        User user = (User) req.getSession().getAttribute(SessionAttribute.USER.getValue());
         return (user != null && user.isAdmin());
     }
 
-    public Long getIdParam(HttpServletRequest req){
+    private Long getIdParam(HttpServletRequest req) {
         return Long.parseLong(req.getPathInfo().split("/")[2]);
     }
 
-    public void refreshSessionUser(HttpServletRequest req){
-        User sessionUser = (User) req.getSession().getAttribute("sessionUser");
+    private void refreshSessionUser(HttpServletRequest req) {
+        User sessionUser = (User) req.getSession().getAttribute(SessionAttribute.USER.getValue());
         sessionUser = sessionUser == null ? null : userService.find(sessionUser.getLogin());
-        req.getSession().setAttribute("sessionUser", sessionUser);
+        req.getSession().setAttribute(SessionAttribute.USER.getValue(), sessionUser);
     }
 }

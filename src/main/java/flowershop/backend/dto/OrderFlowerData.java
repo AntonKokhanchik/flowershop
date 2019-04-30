@@ -2,6 +2,7 @@ package flowershop.backend.dto;
 
 import flowershop.backend.entity.OrderFlowerDataEntity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -9,7 +10,7 @@ import java.util.Objects;
  * DTO for OrderFlowerDataEntity
  * @see OrderFlowerDataEntity
  */
-public class OrderFlowerData {
+public class OrderFlowerData implements Serializable {
     private Long id;
     private String flowerName;
     private BigDecimal price;

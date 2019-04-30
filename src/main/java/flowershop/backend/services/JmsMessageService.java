@@ -41,31 +41,27 @@ public class JmsMessageService {
 
             MessageConsumer consumer = session.createConsumer(receiveUserDiscountXmlQueue);
             connection.start();
+            //<user><login>login2</login><discount>20</discount></user>
             consumer.setMessageListener(
-                    new MessageListener() {
-                        //<user><login>login2</login><discount>20</discount></user>
-                        public void onMessage(Message message) {
-                            try {
-                                String text = ((TextMessage) message).getText();
-                                User m = (User) xmlConverter.convertFromXMLStringToObject(text);
+                    message -> {
+                        try {
+                            String text = ((TextMessage) message).getText();
+                            User m = (User) xmlConverter.convertFromXMLStringToObject(text);
 
-                                User user = userService.find(m.getLogin());
-                                user.setDiscount(m.getDiscount());
-                                userService.update(user);
-                            } catch (IOException | JMSException e) {
-                                LOG.error("Error receiving message");
-                                e.printStackTrace();
-                            }
+                            User user = userService.find(m.getLogin());
+                            user.setDiscount(m.getDiscount());
+                            userService.update(user);
+                        } catch (IOException | JMSException e) {
+                            LOG.error("Error receiving message", e);
                         }
                     });
             LOG.info("Jms Message Service on");
         } catch (JMSException e) {
-            LOG.error("Jms Message Service error");
-            e.printStackTrace();
+            LOG.error("Jms Message Service error", e);
         }
     }
 
-    public void SendNewUserSql(User user) {
+    public void sendNewUserSql(User user) {
         TextMessage msg;
         try {
             msg = session.createTextMessage(xmlConverter.convertFromObjectToXMLString(user));
@@ -74,8 +70,7 @@ public class JmsMessageService {
             producer.send(msg);
             producer.close();
         } catch (JMSException | IOException e) {
-            LOG.error("Error sending message");
-            e.printStackTrace();
+            LOG.error("Error sending message", e);
         }
     }
 }

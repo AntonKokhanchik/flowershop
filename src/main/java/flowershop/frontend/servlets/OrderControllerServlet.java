@@ -2,6 +2,7 @@ package flowershop.frontend.servlets;
 
 import flowershop.backend.dto.Order;
 import flowershop.backend.dto.User;
+import flowershop.backend.enums.SessionAttribute;
 import flowershop.backend.enums.Path;
 import flowershop.backend.exception.FlowerValidationException;
 import flowershop.backend.services.Cart;
@@ -49,7 +50,7 @@ public class OrderControllerServlet extends HttpServlet {
 
         switch (path) {
             case ORDER_INDEX:
-                User user = (User) req.getSession().getAttribute("sessionUser");
+                User user = (User) req.getSession().getAttribute(SessionAttribute.USER.getValue());
 
                 if (user != null)
                     if (user.isAdmin())
@@ -76,29 +77,24 @@ public class OrderControllerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Path path = Path.get(req.getRequestURI());
 
-        if (path == null) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getRequestURI());
-            return;
-        }
-
         switch (path) {
             case ORDER_NEW: {
-                Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
+                Cart cart = (Cart) req.getSession().getAttribute(SessionAttribute.CART.getValue());
 
                 try {
-                    orderService.create(cart, (User) req.getSession().getAttribute("sessionUser"));
+                    orderService.create(cart, (User) req.getSession().getAttribute(SessionAttribute.USER.getValue()));
                 } catch (FlowerValidationException e) {
                     req.getSession().setAttribute("cartErrorMsg", e.getMessage());
                 }
-                req.getSession().removeAttribute("sessionCart");
-                req.getSession().removeAttribute("sessionDetailedCart");
+                req.getSession().removeAttribute(SessionAttribute.CART.getValue());
+                req.getSession().removeAttribute(SessionAttribute.DETAILED_CART.getValue());
 
-                resp.sendRedirect(Path.ORDER_INDEX.getPath());
+                resp.sendRedirect(Path.ORDER_INDEX.getValue());
                 return;
             }
 
             case ADD_TO_CART: {
-                Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
+                Cart cart = (Cart) req.getSession().getAttribute(SessionAttribute.CART.getValue());
                 if (cart == null)
                     cart = new Cart();
                 Long flowerId = getIdParam(req);
@@ -112,48 +108,47 @@ public class OrderControllerServlet extends HttpServlet {
 
                 cart.addItem(flowerService.find(flowerId), count);
 
-                req.getSession().setAttribute("sessionCart", cart);
-                req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));
+                req.getSession().setAttribute(SessionAttribute.CART.getValue(), cart);
+                req.getSession().setAttribute(SessionAttribute.DETAILED_CART.getValue(), orderService.generateDetailedCart(cart));
 
-                resp.sendRedirect(Path.FLOWER_INDEX.getPath());
+                resp.sendRedirect(Path.FLOWER_INDEX.getValue());
                 return;
             }
 
             case REMOVE_FROM_CART: {
-                Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
+                Cart cart = (Cart) req.getSession().getAttribute(SessionAttribute.CART.getValue());
                 Long id = getIdParam(req);
 
                 cart.removeItem(flowerService.find(id), 1);
 
-                req.getSession().setAttribute("sessionCart", cart);
-                req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));
-                resp.sendRedirect(Path.FLOWER_INDEX.getPath());
+                req.getSession().setAttribute(SessionAttribute.CART.getValue(), cart);
+                req.getSession().setAttribute(SessionAttribute.DETAILED_CART.getValue(), orderService.generateDetailedCart(cart));
+                resp.sendRedirect(Path.FLOWER_INDEX.getValue());
                 return;
             }
 
             case REMOVE_CART_ITEM: {
-                Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
+                Cart cart = (Cart) req.getSession().getAttribute(SessionAttribute.CART.getValue());
                 Long id = getIdParam(req);
 
                 cart.removeItem(flowerService.find(id), -1);
 
-                req.getSession().setAttribute("sessionCart", cart);
-                req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));
-                resp.sendRedirect(Path.FLOWER_INDEX.getPath());
+                req.getSession().setAttribute(SessionAttribute.CART.getValue(), cart);
+                req.getSession().setAttribute(SessionAttribute.DETAILED_CART.getValue(), orderService.generateDetailedCart(cart));
+                resp.sendRedirect(Path.FLOWER_INDEX.getValue());
                 return;
             }
 
             case ORDER_PAY: {
-                User user = (User) req.getSession().getAttribute("sessionUser");
+                User user = (User) req.getSession().getAttribute(SessionAttribute.USER.getValue());
                 Order order = orderService.find(getIdParam(req));
 
-                if (user.getLogin().equals(order.getOwner().getLogin()))
-                    if (user.getBalance().compareTo(order.getFullPrice()) >= 0) {
+                if (user.getLogin().equals(order.getOwner().getLogin()) && user.getBalance().compareTo(order.getFullPrice()) >= 0) {
                         orderService.pay(order);
-                        req.getSession().setAttribute("sessionUser", userService.find(user.getLogin()));
+                        req.getSession().setAttribute(SessionAttribute.USER.getValue(), userService.find(user.getLogin()));
                     }
 
-                resp.sendRedirect(Path.ORDER_INDEX.getPath());
+                resp.sendRedirect(Path.ORDER_INDEX.getValue());
                 return;
             }
 
@@ -162,7 +157,7 @@ public class OrderControllerServlet extends HttpServlet {
                     Order order = orderService.find(getIdParam(req));
                     orderService.close(order);
 
-                    resp.sendRedirect(Path.ORDER_INDEX.getPath());
+                    resp.sendRedirect(Path.ORDER_INDEX.getValue());
                     return;
                 }
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -174,7 +169,7 @@ public class OrderControllerServlet extends HttpServlet {
                     Long id = getIdParam(req);
                     orderService.delete(orderService.find(id));
 
-                    resp.sendRedirect(Path.ORDER_INDEX.getPath());
+                    resp.sendRedirect(Path.ORDER_INDEX.getValue());
                     return;
                 }
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -186,18 +181,18 @@ public class OrderControllerServlet extends HttpServlet {
         }
     }
 
-    public boolean isAccessGranted(HttpServletRequest req) {
-        User user = (User) req.getSession().getAttribute("sessionUser");
+    private boolean isAccessGranted(HttpServletRequest req) {
+        User user = (User) req.getSession().getAttribute(SessionAttribute.USER.getValue());
         return (user != null && user.isAdmin());
     }
 
-    private Long getIdParam(HttpServletRequest req){
+    private Long getIdParam(HttpServletRequest req) {
         return Long.parseLong(req.getPathInfo().split("/")[2]);
     }
 
-    public void refreshSessionUser(HttpServletRequest req){
-        User sessionUser = (User) req.getSession().getAttribute("sessionUser");
+    private void refreshSessionUser(HttpServletRequest req) {
+        User sessionUser = (User) req.getSession().getAttribute(SessionAttribute.USER.getValue());
         sessionUser = sessionUser == null ? null : userService.find(sessionUser.getLogin());
-        req.getSession().setAttribute("sessionUser", sessionUser);
+        req.getSession().setAttribute(SessionAttribute.USER.getValue(), sessionUser);
     }
 }

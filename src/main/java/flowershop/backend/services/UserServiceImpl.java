@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(FlowerServiceImpl.class);
 
     @Autowired
@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService{
     private UserDAO userDAO;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         LOG.info("User service on");
     }
 
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService{
         userDAO.create(user.toEntity());
 
         createXML(user);
-        jmsMessageService.SendNewUserSql(user);
+        jmsMessageService.sendNewUserSql(user);
     }
 
     @Override
@@ -95,16 +95,12 @@ public class UserServiceImpl implements UserService{
 
     @Override
     // TODO: брать путь для создания xml из конфига
-    public void createXML(User user){
+    public void createXML(User user) {
         try {
             converter.convertFromObjectToXML(user, "userXML/user_"+user.getLogin()+".xml");
-            LOG.info("user "+user.getLogin()+".xml created");
-
-//            user = (User) converter.convertFromXMLToObject("user "+user.getLogin()+".xml");
-//            LOG.info("if convert back will be " + user);
+            LOG.info("user {}.xml created", user.getLogin());
         } catch (IOException e) {
-            LOG.error("Failed to convert to xml");
-            e.printStackTrace();
+            LOG.error("Failed to convert to xml", e);
         }
     }
 }

@@ -2,10 +2,11 @@ package flowershop.backend.dto;
 
 import flowershop.backend.entity.FlowerEntity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class Flower {
+public class Flower implements Serializable {
     private Long id;
     private String name;
     private BigDecimal price;

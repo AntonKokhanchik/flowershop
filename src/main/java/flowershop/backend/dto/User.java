@@ -2,10 +2,11 @@ package flowershop.backend.dto;
 
 import flowershop.backend.entity.UserEntity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class User {
+public class User implements Serializable {
     private String login;
     private String password;
     private String fullName;
@@ -14,10 +15,10 @@ public class User {
     private BigDecimal balance;
     private Integer discount;
 
-    public User(){}
+    public User() { }
 
     public User(String login, String password, String fullName, String address,
-                String phone){
+                String phone) {
         this.login = login;
         this.password = password;
         this.fullName = fullName;
@@ -25,7 +26,7 @@ public class User {
         this.phone = phone;
     }
 
-    public User(UserEntity user){
+    public User(UserEntity user) {
         login = user.getLogin();
         password = user.getPassword();
         fullName = user.getFullName();
@@ -35,7 +36,7 @@ public class User {
         discount = user.getDiscount();
     }
 
-    public UserEntity toEntity(){
+    public UserEntity toEntity() {
         UserEntity entity = new UserEntity();
         entity.setLogin(login);
         entity.setPassword(password);
@@ -103,7 +104,9 @@ public class User {
         this.discount = discount;
     }
 
-    public boolean isAdmin(){return login.equals("admin");}
+    public boolean isAdmin() {
+        return login.equals("admin");
+    }
 
     @Override
     public boolean equals(Object o) {

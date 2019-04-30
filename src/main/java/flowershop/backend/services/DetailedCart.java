@@ -2,6 +2,7 @@ package flowershop.backend.services;
 
 import flowershop.backend.dto.OrderFlowerData;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -10,7 +11,7 @@ import java.util.Set;
 /**
  * Cart with detailed information to show
  */
-public class DetailedCart {
+public class DetailedCart implements Serializable {
     private Set<OrderFlowerData> items;
 
     public DetailedCart(Set<OrderFlowerData> items) {
@@ -36,7 +37,7 @@ public class DetailedCart {
      * @return sum with discount
      */
     public BigDecimal getResult(Integer discount) {
-        return getSum().multiply(new BigDecimal(1 - discount / 100f)).setScale(2, RoundingMode.DOWN);
+        return getSum().multiply(BigDecimal.valueOf(1 - discount / 100f)).setScale(2, RoundingMode.DOWN);
     }
 
     public Set<OrderFlowerData> getItems() {

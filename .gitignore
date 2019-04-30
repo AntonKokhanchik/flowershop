@@ -1,4 +1,6 @@
 userXML/
+/.idea/sonarlint-state.xml
+/.idea/checkstyle-idea.xml
 # Created by https://www.gitignore.io/api/maven,intellij
 # Edit at https://www.gitignore.io/?templates=maven,intellij
 

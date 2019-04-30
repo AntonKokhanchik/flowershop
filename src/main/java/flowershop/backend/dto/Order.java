@@ -1,5 +1,6 @@
 package flowershop.backend.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -7,7 +8,7 @@ import java.util.Objects;
 import flowershop.backend.enums.OrderStatus;
 import flowershop.backend.entity.OrderEntity;
 
-public class Order {
+public class Order implements Serializable {
     private Long id;
     private BigDecimal fullPrice;
     private LocalDateTime dateCreation;

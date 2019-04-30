@@ -23,17 +23,17 @@ public enum Path {
     FLOWER_INDEX    ("/flower",         false,"/flowerIndex.jsp");
 
     private String page;
-    private String path;
+    private String value;
     private boolean hasParam;
 
-    Path(String path, boolean hasParam, String page) {
-        this.path = path;
+    Path(String value, boolean hasParam, String page) {
+        this.value = value;
         this.hasParam = hasParam;
         this.page = page;
     }
 
-    Path(String path, boolean hasParam) {
-        this.path = path;
+    Path(String value, boolean hasParam) {
+        this.value = value;
         this.hasParam = hasParam;
     }
 
@@ -41,24 +41,30 @@ public enum Path {
         return page;
     }
 
-    public String getPath(){
-        return path;
+    public String getValue() {
+        return value;
     }
 
+    /**
+     * Returns enum constant from given path string
+     * @param path
+     * @return
+     */
     public static Path get(String path) {
         if(path.equals("/"))
             return FLOWER_INDEX;
 
         for (Path p : Path.values())
-            if (path.equals(p.path) || (p.hasParam && path.contains(p.path)))
+            if (path.equals(p.value) || (p.hasParam && path.contains(p.value)))
                 return p;
         return null;
     }
 
-    public static Map<String, String> getPathMap(){
+    public static Map<String, String> getPathMap() {
         Map<String, String> map = new HashMap<>();
+
         for (Path p : Path.values())
-            map.put(p.name(), p.path);
+            map.put(p.name(), p.value);
 
         return map;
     }

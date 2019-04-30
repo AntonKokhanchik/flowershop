@@ -1,7 +1,7 @@
 package flowershop.backend.services;
 
 import flowershop.backend.dao.UserDAO;
-import flowershop.backend.dto.User;
+import flowershop.frontend.dto.User;
 import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.UserValidationException;
 import org.slf4j.Logger;

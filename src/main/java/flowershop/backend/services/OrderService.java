@@ -1,8 +1,8 @@
 package flowershop.backend.services;
 
-import flowershop.backend.dto.Order;
-import flowershop.backend.dto.OrderFlowerData;
-import flowershop.backend.dto.User;
+import flowershop.frontend.dto.Order;
+import flowershop.frontend.dto.OrderFlowerData;
+import flowershop.frontend.dto.User;
 import flowershop.backend.exception.FlowerValidationException;
 
 import java.util.List;

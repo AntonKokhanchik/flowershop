@@ -1,7 +1,7 @@
 package flowershop.frontend.servlets;
 
-import flowershop.backend.dto.Flower;
-import flowershop.backend.dto.User;
+import flowershop.frontend.dto.Flower;
+import flowershop.frontend.dto.User;
 import flowershop.backend.enums.SessionAttribute;
 import flowershop.backend.enums.Path;
 import flowershop.backend.services.FlowerService;

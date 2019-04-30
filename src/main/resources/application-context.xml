@@ -3,7 +3,6 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:jee="http://www.springframework.org/schema/jee"
        xmlns:jaxws="http://cxf.apache.org/jaxws"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans
@@ -12,55 +11,10 @@
         http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/tx
         http://www.springframework.org/schema/tx/spring-tx.xsd
-        http://www.springframework.org/schema/jee
-        http://www.springframework.org/schema/jee/spring-jee.xsd
         http://cxf.apache.org/jaxws
         http://cxf.apache.org/schemas/jaxws.xsd">
 
     <context:component-scan base-package="flowershop"/>
-
-    <jee:jndi-lookup id="dataSource" jndi-name="jdbc/flowerShopDS"/>
-
-    <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
-        <property name="dataSource" ref="dataSource"/>   <!-- reference to datasource bean-->
-        <property name="locations">
-            <array><value>dbscripts</value></array>      <!-- scripts location folder -->
-        </property>
-        <property name="baselineOnMigrate" value="false"/>
-        <property name="outOfOrder" value="true"/>
-        <property name="sqlMigrationPrefix" value="v"/>
-        <property name="sqlMigrationSeparator" value="__"/>
-        <property name="placeholderPrefix" value="@{"/>
-        <property name="placeholderSuffix" value="}"/>
-    </bean>
-
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
-          depends-on="flyway">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="packagesToScan">
-            <list><value>flowershop.backend.entity</value></list>
-        </property>
-        <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-                <property name="database" value="ORACLE" />
-                <property name="generateDdl" value="false"/>
-                <property name="showSql" value="true"/>
-            </bean>
-        </property>
-        <property name="jpaDialect">
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
-        </property>
-        <property name="jpaProperties">
-            <props>
-                <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
-                <prop key="hibernate.show_sql">true</prop>
-            </props>
-        </property>
-    </bean>
-
-    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" >
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
-    </bean>
 
     <bean id="XMLConverter" class="flowershop.backend.services.XMLConverter">
         <property name="marshaller" ref="castorMarshaller" />
@@ -77,8 +31,4 @@
     <bean id="FlowersStockImpl" class="flowershop.webService.FlowersStockServiceImpl" />
     <!-- JAX-WS endpoint bean which is picked up by CXF -->
     <jaxws:endpoint id="FlowersStock" implementor="#FlowersStockImpl" address="/FlowersStock"/>
-
-    <jee:jndi-lookup id="connectionFactory" jndi-name="jms/connectionFactory"/>
-    <jee:jndi-lookup id="sendNewUsersXmlQueue" jndi-name="jms/outQueue"/>
-    <jee:jndi-lookup id="receiveUserDiscountXmlQueue" jndi-name="jms/inQueue"/>
 </beans>

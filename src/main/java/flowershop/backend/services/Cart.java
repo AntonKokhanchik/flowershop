@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.dto.Flower;
+import flowershop.frontend.dto.Flower;
 
 import java.io.Serializable;
 import java.util.HashMap;

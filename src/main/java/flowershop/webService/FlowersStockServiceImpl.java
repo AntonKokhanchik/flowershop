@@ -1,7 +1,9 @@
 package flowershop.webService;
 
-import flowershop.backend.dao.FlowerDAO;
-import flowershop.backend.entity.FlowerEntity;
+import flowershop.backend.exception.FlowerValidationException;
+import flowershop.backend.services.FlowerService;
+import flowershop.frontend.dto.Flower;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,17 +14,23 @@ import java.util.List;
 @WebService(endpointInterface = "flowershop.webService.FlowersStockService")
 @Service
 public class FlowersStockServiceImpl implements FlowersStockService {
+    private static final Logger LOG = LoggerFactory.getLogger(FlowersStockServiceImpl.class);
+
     @Autowired
-    private FlowerDAO flowerDAO;
+    private FlowerService flowerService;
 
     @Override
     public void increaseFlowersStockSize (int count) {
-        List<FlowerEntity> entities = flowerDAO.getAll();
+        List<Flower> entities = flowerService.getAll();
 
-        for (FlowerEntity e : entities) {
+        for (Flower e : entities) {
             e.setCount(e.getCount() + count);
-            flowerDAO.update(e);
+            try {
+                flowerService.update(e);
+            } catch (FlowerValidationException ex) {
+                LOG.error("Increase flowers stock error", ex);
+            }
         }
-        LoggerFactory.getLogger(FlowersStockServiceImpl.class).info("Flowers stock increased by {}", count);
+        LOG.info("Flowers stock increased by {}", count);
     }
 }

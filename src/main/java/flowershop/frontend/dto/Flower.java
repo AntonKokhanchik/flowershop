@@ -1,4 +1,4 @@
-package flowershop.backend.dto;
+package flowershop.frontend.dto;
 
 import flowershop.backend.entity.FlowerEntity;
 

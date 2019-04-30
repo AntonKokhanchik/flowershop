@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.dto.User;
+import flowershop.frontend.dto.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

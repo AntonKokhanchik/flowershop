@@ -204,13 +204,13 @@
 
 TODO:
     [ ] [30.04.19 15:44]
-        [ ] разбить application-context.xml на несколько частей
-        [ ] например вынести все что связано c jms в отдльный файл
-        [ ] пакет dto перенести в frontend
-        [ ] flowershop.webService.rest.LoginCheckService - полная аналогия с сервлетами.
+        [x] разбить application-context.xml на несколько частей
+            например вынести все что связано c jms в отдльный файл
+        [x] пакет dto перенести в frontend
+        [x] flowershop.webService.rest.LoginCheckService - полная аналогия с сервлетами.
             Не очень хорошо из контроллера сразу в DAO
             нужна трехзвенная связь
-        [ ] flowershop.webService.FlowersStockServiceImpl <-> flowerDAO аналогично
+        [x] flowershop.webService.FlowersStockServiceImpl <-> flowerDAO аналогично
         [ ] сделать маппинг dto - entity с помощью отдельного сервиса маппера (dozer)
         [ ] сделать возможность поиска по отдельным критериям по ассортименту цветов на стороне бэкенда.
             Т.е. с фронта должен прилетать какой-то фильтр, например по цене, цвету, типу цветка (возможны любые комбинации критериев) и бэк должен фильтровать на уровне sql запросы

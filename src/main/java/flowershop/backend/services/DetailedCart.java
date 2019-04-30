@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.dto.OrderFlowerData;
+import flowershop.frontend.dto.OrderFlowerData;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

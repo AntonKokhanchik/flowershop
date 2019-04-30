@@ -1,7 +1,7 @@
 <?xml version="1.0"?><!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
         "http://castor.org/mapping.dtd">
 <mapping>
-    <class name="flowershop.backend.dto.User">
+    <class name="flowershop.frontend.dto.User">
         <map-to xml="user" />
         <field name="login" />
         <field name="password" />

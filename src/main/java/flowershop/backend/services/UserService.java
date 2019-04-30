@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.dto.User;
+import flowershop.frontend.dto.User;
 import flowershop.backend.exception.UserValidationException;
 
 import java.util.List;

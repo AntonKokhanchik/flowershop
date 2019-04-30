@@ -1,4 +1,4 @@
-package flowershop.backend.dto;
+package flowershop.frontend.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

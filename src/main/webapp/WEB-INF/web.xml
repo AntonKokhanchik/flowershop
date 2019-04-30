@@ -6,7 +6,11 @@
     <display-name>Archetype Created Web Application</display-name>
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:/application-context.xml</param-value>
+        <param-value>
+            classpath:/application-context.xml
+            classpath:/application-context-jms.xml
+            classpath:/application-context-database.xml
+        </param-value>
     </context-param>
 
     <listener>

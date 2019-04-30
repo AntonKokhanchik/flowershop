@@ -18,14 +18,19 @@
             <tbody>
                 <c:forEach items="${sessionDetailedCart.items}" var="item">
                     <tr>
-                        <td>${item.flowerName}</th>
+                        <td>${item.flowerName}</td>
                         <td>${item.price}</td>
                         <td>${item.count}</td>
                         <td>${item.getFullPrice()}</td>
                         <td>
-                            <form action="${path.REMOVE_FROM_CART}/${item.flowerId}" method="post">
-                                <input class="btn btn-light btn-sm" type="submit" value=" - " />
-                            </form>
+                            <div class="btn-group">
+                                <form action="${path.REMOVE_FROM_CART}/${item.flowerId}" method="post">
+                                    <input class="btn btn-light btn-sm" type="submit" value=" - " />
+                                </form>
+                                <form action="${path.REMOVE_CART_ITEM}/${item.flowerId}" method="post">
+                                    <input class="btn btn-light btn-sm" type="submit" value=" x " />
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 </c:forEach>

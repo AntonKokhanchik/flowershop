@@ -12,6 +12,7 @@ public enum Path {
     ORDER_SHOW      ("/order/detail",   true, "/orderShow.jsp" ),
     ADD_TO_CART     ("/order/add_to_cart",true),
     REMOVE_FROM_CART("/order/remove_from_cart",true),
+    REMOVE_CART_ITEM("/order/remove_cart_item",true),
     ORDER_PAY       ("/order/pay",      true),
     ORDER_CLOSE     ("/order/close",    true),
     ORDER_DELETE    ("/order/delete",   true),

@@ -25,12 +25,17 @@
             <tbody>
                 <c:forEach items="${flowers}" var="f">
                     <tr>
-                        <td>${f.name}</th>
+                        <td>${f.name}</td>
                         <td>${f.price}</td>
                         <td>${f.count}</td>
                         <td>
                             <form action="${path.ADD_TO_CART}/${f.id}" method="post">
-                                <input class="btn btn-success" type="submit" value="Add to cart" />
+                                <div class="input-group">
+                                    <input name="count" type="number" class="form-control" placeholder="Count" max="${f.count - sessionCart.items.get(f.id)}" min=1>
+                                    <div class="input-group-append">
+                                        <input class="btn btn-success" type="submit" value="Add to cart" />
+                                    </div>
+                                </div>
                             </form>
                         </td>
                         <c:if test="${sessionUser.isAdmin()}">

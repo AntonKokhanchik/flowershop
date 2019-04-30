@@ -43,7 +43,6 @@
 [+] - partially done
 [x] - done
 
-todo-list:
 [x] Module 1 Activity:
     [x] Install Tomcat v8 (\\10.10.10.41\Shared\Everyone\JAVA_Capability\Distr)
         Just unzip tomcat to the desired location.

@@ -30,30 +30,33 @@ public class Cart {
      * Add flower to cart, cannot (do nothing) add more than flowers count in shop
      * @param flower flower to add
      */
-    public void addItem(Flower flower) {
-        if (flower.getCount() < 1)
-            return;
-
+    public void addItem(Flower flower, Integer count) {
         Long flowerId = flower.getId();
-        if (items.containsKey(flowerId)) {
-            if (items.get(flowerId) < flower.getCount())
-                items.put(flowerId, items.get(flowerId) + 1);
-        } else
-            items.put(flowerId, 1);
+        Integer stock = 0;
+
+        if (items.containsKey(flowerId))
+            stock = items.get(flowerId);
+
+        if (stock + count < flower.getCount())
+            items.put(flowerId, stock + count);
+        else
+            items.put(flowerId, flower.getCount());
     }
 
     /**
      * Remove flower from cart
      * @param flower flower to remove
      */
-    public void removeItem(Flower flower) {
+    public void removeItem(Flower flower, Integer count) {
         Long flowerId = flower.getId();
+        if (count == -1)
+            items.remove(flowerId);
         if (!items.containsKey(flowerId))
             return;
 
         items.put(flowerId, items.get(flowerId) - 1);
 
-        if (items.get(flowerId) == 0)
+        if (items.get(flowerId) <= 0)
             items.remove(flowerId);
     }
 

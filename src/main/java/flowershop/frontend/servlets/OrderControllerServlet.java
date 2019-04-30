@@ -90,9 +90,8 @@ public class OrderControllerServlet extends HttpServlet {
                 } catch (FlowerValidationException e) {
                     req.getSession().setAttribute("cartErrorMsg", e.getMessage());
                 }
-                cart.clear();
-                req.getSession().setAttribute("sessionCart", cart);
-                req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));
+                req.getSession().removeAttribute("sessionCart");
+                req.getSession().removeAttribute("sessionDetailedCart");
 
                 resp.sendRedirect(Path.ORDER_INDEX.getPath());
                 return;
@@ -104,7 +103,14 @@ public class OrderControllerServlet extends HttpServlet {
                     cart = new Cart();
                 Long flowerId = getIdParam(req);
 
-                cart.addItem(flowerService.find(flowerId));
+                String parameter = req.getParameter("count");
+                if (parameter.equals(""))
+                    parameter = "1";
+
+                Integer count;
+                count = Integer.parseInt(parameter);
+
+                cart.addItem(flowerService.find(flowerId), count);
 
                 req.getSession().setAttribute("sessionCart", cart);
                 req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));
@@ -117,7 +123,19 @@ public class OrderControllerServlet extends HttpServlet {
                 Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
                 Long id = getIdParam(req);
 
-                cart.removeItem(flowerService.find(id));
+                cart.removeItem(flowerService.find(id), 1);
+
+                req.getSession().setAttribute("sessionCart", cart);
+                req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));
+                resp.sendRedirect(Path.FLOWER_INDEX.getPath());
+                return;
+            }
+
+            case REMOVE_CART_ITEM: {
+                Cart cart = (Cart) req.getSession().getAttribute("sessionCart");
+                Long id = getIdParam(req);
+
+                cart.removeItem(flowerService.find(id), -1);
 
                 req.getSession().setAttribute("sessionCart", cart);
                 req.getSession().setAttribute("sessionDetailedCart", orderService.generateDetailedCart(cart));

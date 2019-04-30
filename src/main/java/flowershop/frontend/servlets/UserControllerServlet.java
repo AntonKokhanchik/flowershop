@@ -73,7 +73,9 @@ public class UserControllerServlet extends HttpServlet {
         switch (path) {
             case LOGOUT:
                 req.getSession().removeAttribute("sessionUser");
-                resp.sendRedirect(req.getHeader("referer"));
+                req.getSession().removeAttribute("sessionCart");
+                req.getSession().removeAttribute("sessionDetailedCart");
+                resp.sendRedirect(Path.LOGIN.getPath());
                 return;
 
             case REGISTER:

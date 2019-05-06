@@ -3,6 +3,7 @@ package flowershop.backend.services;
 import flowershop.frontend.dto.Flower;
 import flowershop.backend.exception.FlowerValidationException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -45,4 +46,6 @@ public interface FlowerService {
      * @return flowers list
      */
     List<Flower> getAll();
+
+    List<Flower> getAll(String sort, String order, String name, BigDecimal price_min, BigDecimal price_max);
 }

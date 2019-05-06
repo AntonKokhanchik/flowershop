@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet(urlPatterns = {"/", "/flower/*"})
@@ -27,7 +28,6 @@ public class FlowerControllerServlet extends HttpServlet {
 
     @Autowired
     private UserService userService;
-
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -61,7 +61,10 @@ public class FlowerControllerServlet extends HttpServlet {
                 return;
 
             case FLOWER_INDEX:
-                req.setAttribute("flowers", flowerService.getAll());
+                req.setAttribute("flowers", getAllFlowersWithHttpParams(req));
+                for (Map.Entry<String, String[]> p : req.getParameterMap().entrySet()) {
+                    req.setAttribute(p.getKey(), p.getValue()[0]);
+                }
                 break;
 
             default:
@@ -140,7 +143,7 @@ public class FlowerControllerServlet extends HttpServlet {
         }
     }
 
-    public Flower parseFlower(HttpServletRequest req) throws FlowerValidationException {
+    private Flower parseFlower(HttpServletRequest req) throws FlowerValidationException {
         // parse id
         String parameter = req.getParameter("id");
         Long id = (parameter == null || parameter.equals("")) ? null : Long.parseLong(parameter);
@@ -170,8 +173,6 @@ public class FlowerControllerServlet extends HttpServlet {
         return new Flower(id, name, price, count);
     }
 
-
-
     private boolean isAccessGranted(HttpServletRequest req) {
         User user = (User) req.getSession().getAttribute(SessionAttribute.USER.getValue());
         return (user != null && user.isAdmin());
@@ -179,6 +180,22 @@ public class FlowerControllerServlet extends HttpServlet {
 
     private Long getIdParam(HttpServletRequest req) {
         return Long.parseLong(req.getPathInfo().split("/")[2]);
+    }
+
+    private List<Flower> getAllFlowersWithHttpParams(HttpServletRequest req) {
+        String param = req.getParameter("sort");
+        String sort = param == null || param.equals("") ? "name" : param;
+
+        param = req.getParameter("price_min");
+        BigDecimal priceMin = (param == null || param.equals("")) ? BigDecimal.ZERO : new BigDecimal(param);
+
+        param = req.getParameter("price_max");
+        BigDecimal priceMax = (param == null || param.equals("")) ? BigDecimal.valueOf(Long.MAX_VALUE) : new BigDecimal(param);
+
+        param = req.getParameter("name");
+        String name = (param == null || param.equals("")) ? "%" : String.format("%%%s%%", param);
+
+        return flowerService.getAll(sort, req.getParameter("order"), name, priceMin, priceMax);
     }
 
     private void refreshSessionUser(HttpServletRequest req) {

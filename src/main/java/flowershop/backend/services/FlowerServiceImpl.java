@@ -55,9 +55,18 @@ public class FlowerServiceImpl implements FlowerService {
         return mapper.map(flowerDAO.find(id), Flower.class);
     }
 
-    @Override
     public List<Flower> getAll() {
         List<FlowerEntity> entities = flowerDAO.getAll();
+        List<Flower> flowers = new LinkedList<>();
+
+        for (FlowerEntity e : entities)
+            flowers.add(mapper.map(e, Flower.class));
+
+        return flowers;}
+
+    @Override
+    public List<Flower> getAll(String sort, String order, String name, BigDecimal priceMin, BigDecimal priceMax) {
+        List<FlowerEntity> entities = flowerDAO.getAll(sort, order, name, priceMin, priceMax);
         List<Flower> flowers = new LinkedList<>();
 
         for (FlowerEntity e : entities)

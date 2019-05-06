@@ -8,6 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Repository
@@ -43,5 +47,34 @@ public class FlowerDAO {
 
     public List<FlowerEntity> getAll() {
         return em.createNamedQuery("getAllFlowers", FlowerEntity.class).getResultList();
+    }
+
+    public List<FlowerEntity> getAll(String sort, String order, String name, BigDecimal priceMin, BigDecimal priceMax) {
+        Query q = em.createNamedQuery("getAllFlowers", FlowerEntity.class);
+        q.setParameter("name", name);
+        q.setParameter("price_min", priceMin);
+        q.setParameter("price_max", priceMax);
+        List result = q.getResultList();
+
+        Comparator comparator;
+        switch (sort) {
+            case "price":
+                comparator = Comparator.comparing(o -> ((FlowerEntity) o).getPrice());
+                break;
+            case "count":
+                comparator = Comparator.comparing(o -> ((FlowerEntity) o).getCount());
+                break;
+            case "name":
+            default:
+                comparator = Comparator.comparing(o -> ((FlowerEntity) o).getName());
+                break;
+        }
+
+        if (order != null && order.equals("desc"))
+            comparator = Collections.reverseOrder(comparator);
+
+        result.sort(comparator);
+
+        return result;
     }
 }

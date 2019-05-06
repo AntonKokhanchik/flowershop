@@ -13,6 +13,7 @@ import flowershop.frontend.dto.User;
 import flowershop.backend.entity.OrderEntity;
 import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.FlowerValidationException;
+import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ public class OrderServiceImpl implements OrderService {
     private FlowerDAO flowerDAO;
     @Autowired
     private UserDAO userDAO;
+    @Autowired
+    private Mapper mapper;
 
     @PostConstruct
     public void initialize() {
@@ -56,12 +59,18 @@ public class OrderServiceImpl implements OrderService {
         DetailedCart detailedCart = generateDetailedCart(cart);
 
         // create order
-        OrderEntity order = new Order(detailedCart.getResult(user.getDiscount()),
-                LocalDateTime.now(), null, OrderStatus.CREATED, user.getDiscount()).toEntity();
+        OrderEntity order = mapper.map(
+                new Order(
+                    detailedCart.getResult(user.getDiscount()),
+                    LocalDateTime.now(),
+                    null,
+                    OrderStatus.CREATED,
+                    user.getDiscount()
+                ), OrderEntity.class);
 
         // add flower data
         for (OrderFlowerData f : detailedCart.getItems()) {
-            OrderFlowerDataEntity fe = f.toEntity();
+            OrderFlowerDataEntity fe = mapper.map(f, OrderFlowerDataEntity.class);
             order.addFlowerData(fe);
         }
 
@@ -98,12 +107,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void delete(Order order) {
-        orderDAO.delete(order.toEntity());
+        orderDAO.delete(mapper.map(order, OrderEntity.class));
     }
 
     @Override
     public Order find(Long id) {
-        return new Order(orderDAO.find(id));
+        return mapper.map(orderDAO.find(id), Order.class);
     }
 
     @Override
@@ -112,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = new LinkedList<>();
 
         for (OrderEntity e : entities)
-            orders.add(new Order(e));
+            orders.add(mapper.map(e, Order.class));
 
         return orders;
     }
@@ -126,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = new LinkedList<>();
 
         for (OrderEntity e : entities)
-            orders.add(new Order(e));
+            orders.add(mapper.map(e, Order.class));
 
         return orders;
     }
@@ -140,7 +149,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderFlowerData> flowersData = new LinkedList<>();
 
         for (OrderFlowerDataEntity e : entities)
-            flowersData.add(new OrderFlowerData(e));
+            flowersData.add(mapper.map(e, OrderFlowerData.class));
 
         return flowersData;
     }
@@ -150,7 +159,7 @@ public class OrderServiceImpl implements OrderService {
         Set<OrderFlowerData> items = new HashSet<>();
 
         for (Map.Entry<Long, Integer> entry : cart.getItems().entrySet())
-            items.add(new Flower(flowerDAO.find(entry.getKey())).toOrderData(entry.getValue()));
+            items.add(mapper.map(flowerDAO.find(entry.getKey()), Flower.class).toOrderData(entry.getValue()));
 
         return new DetailedCart(items);
     }

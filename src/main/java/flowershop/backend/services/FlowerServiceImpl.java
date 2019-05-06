@@ -4,6 +4,7 @@ import flowershop.backend.dao.FlowerDAO;
 import flowershop.frontend.dto.Flower;
 import flowershop.backend.entity.FlowerEntity;
 import flowershop.backend.exception.FlowerValidationException;
+import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class FlowerServiceImpl implements FlowerService {
     @Autowired
     private FlowerDAO flowerDAO;
 
+    @Autowired
+    private Mapper mapper;
+
     @PostConstruct
     public void initialize() {
         LOG.info("Flower service on");
@@ -29,25 +33,26 @@ public class FlowerServiceImpl implements FlowerService {
     @Override
     public void create(Flower flower) throws FlowerValidationException {
         validate(flower);
-        flowerDAO.create(flower.toEntity());
+
+        flowerDAO.create(mapper.map(flower, FlowerEntity.class));
     }
 
     @Override
     @Transactional
     public void update(Flower flower) throws FlowerValidationException {
         validate(flower);
-        flowerDAO.update(flower.toEntity());
+        flowerDAO.update(mapper.map(flower, FlowerEntity.class));
     }
 
     @Override
     @Transactional
     public void delete(Flower flower) {
-        flowerDAO.delete(flower.toEntity());
+        flowerDAO.delete(mapper.map(flower, FlowerEntity.class));
     }
 
     @Override
     public Flower find(Long id) {
-        return new Flower(flowerDAO.find(id));
+        return mapper.map(flowerDAO.find(id), Flower.class);
     }
 
     @Override
@@ -56,7 +61,7 @@ public class FlowerServiceImpl implements FlowerService {
         List<Flower> flowers = new LinkedList<>();
 
         for (FlowerEntity e : entities)
-            flowers.add(new Flower(e));
+            flowers.add(mapper.map(e, Flower.class));
 
         return flowers;
     }

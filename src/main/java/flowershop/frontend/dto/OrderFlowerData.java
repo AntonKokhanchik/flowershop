@@ -19,19 +19,13 @@ public class OrderFlowerData implements Serializable {
 
     private Long flowerId;
 
+    public OrderFlowerData() { }
+
     public OrderFlowerData(String flowerName, BigDecimal price, Integer count, Long flowerId) {
         this.flowerName = flowerName;
         this.price = price;
         this.count = count;
         this.flowerId = flowerId;
-    }
-
-    public OrderFlowerData(OrderFlowerDataEntity entity) {
-        id = entity.getId();
-        flowerName = entity.getFlowerName();
-        price = entity.getPrice();
-        count = entity.getCount();
-        order = new Order(entity.getOrder());
     }
 
     public Long getId() {
@@ -87,15 +81,6 @@ public class OrderFlowerData implements Serializable {
 
     public void setOrder(Order order) {
         this.order = order;
-    }
-
-    public OrderFlowerDataEntity toEntity() {
-        OrderFlowerDataEntity entity = new OrderFlowerDataEntity();
-        entity.setId(id);
-        entity.setFlowerName(flowerName);
-        entity.setPrice(price);
-        entity.setCount(count);
-        return entity;
     }
 
     @Override

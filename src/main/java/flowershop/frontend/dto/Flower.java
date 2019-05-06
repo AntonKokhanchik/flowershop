@@ -1,7 +1,5 @@
 package flowershop.frontend.dto;
 
-import flowershop.backend.entity.FlowerEntity;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -19,12 +17,7 @@ public class Flower implements Serializable {
         this.count = count;
     }
 
-    public Flower(FlowerEntity entity) {
-        id = entity.getId();
-        name = entity.getName();
-        price = entity.getPrice();
-        count = entity.getCount();
-    }
+    public Flower() { }
 
     public Long getId() {
         return id;
@@ -56,16 +49,6 @@ public class Flower implements Serializable {
 
     public void setCount(Integer count) {
         this.count = count;
-    }
-
-    public FlowerEntity toEntity() {
-        FlowerEntity entity = new FlowerEntity();
-        entity.setId(id);
-        entity.setName(name);
-        entity.setPrice(price);
-        entity.setCount(count);
-
-        return entity;
     }
 
     public OrderFlowerData toOrderData(Integer count) {

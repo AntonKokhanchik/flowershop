@@ -69,7 +69,7 @@ public class JmsMessageService {
             MessageProducer producer = session.createProducer(sendNewUsersXmlQueue);
             producer.send(msg);
             producer.close();
-        } catch (JMSException | IOException e) {
+        } catch (JMSException | IOException | NullPointerException e) {
             LOG.error("Error sending message", e);
         }
     }

@@ -16,19 +16,30 @@
 
     <context:component-scan base-package="flowershop"/>
 
+    <!--  XMLConverter  -->
     <bean id="XMLConverter" class="flowershop.backend.services.XMLConverter">
         <property name="marshaller" ref="castorMarshaller" />
         <property name="unmarshaller" ref="castorMarshaller" />
     </bean>
 
+    <!--  castor  -->
     <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller">
         <property name="mappingLocation" value="classpath:mapping.xml" />
     </bean>
 
     <tx:annotation-driven/>
 
-    <!-- Service implementor bean -->
+    <!--  Flowers Stock web service  -->
     <bean id="FlowersStockImpl" class="flowershop.webService.FlowersStockServiceImpl" />
-    <!-- JAX-WS endpoint bean which is picked up by CXF -->
     <jaxws:endpoint id="FlowersStock" implementor="#FlowersStockImpl" address="/FlowersStock"/>
+
+    <!--  dozer  -->
+    <bean id="mapper" class="org.dozer.DozerBeanMapper" >
+        <property name="mappingFiles">
+            <list>
+                <!--  for java.time.LocalDateTime mapping  -->
+                <value>dozerJdk8Converters.xml</value>
+            </list>
+        </property>
+    </bean>
 </beans>

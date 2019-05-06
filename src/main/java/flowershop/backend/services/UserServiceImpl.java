@@ -4,6 +4,7 @@ import flowershop.backend.dao.UserDAO;
 import flowershop.frontend.dto.User;
 import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.UserValidationException;
+import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDAO userDAO;
 
+    @Autowired
+    private Mapper mapper;
+
     @PostConstruct
     public void init() {
         LOG.info("User service on");
@@ -38,7 +42,7 @@ public class UserServiceImpl implements UserService {
         user.setBalance(new BigDecimal(2000));
         user.setDiscount(0);
 
-        userDAO.create(user.toEntity());
+        userDAO.create(mapper.map(user, UserEntity.class));
 
         createXML(user);
         jmsMessageService.sendNewUserSql(user);
@@ -60,12 +64,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(User user) {
-        userDAO.delete(user.toEntity());
+        userDAO.delete(mapper.map(user, UserEntity.class));
     }
 
     @Override
     public User find(String login) {
-        return new User(userDAO.find(login));
+        return mapper.map(userDAO.find(login), User.class);
     }
 
     @Override
@@ -74,7 +78,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = new LinkedList<>();
 
         for(UserEntity e : entities)
-            users.add(new User(e));
+            users.add(mapper.map(e, User.class));
 
         return users;
     }
@@ -90,7 +94,8 @@ public class UserServiceImpl implements UserService {
             throw new UserValidationException(UserValidationException.WRONG_PASSWORD);
 
         LOG.info("User logged in: {}", userEntity);
-        return new User(userEntity);
+
+        return mapper.map(userEntity, User.class);
     }
 
     @Override

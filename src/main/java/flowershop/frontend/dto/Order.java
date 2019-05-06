@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import flowershop.backend.enums.OrderStatus;
-import flowershop.backend.entity.OrderEntity;
 
 public class Order implements Serializable {
     private Long id;
@@ -17,6 +16,8 @@ public class Order implements Serializable {
     private Integer appliedDiscount;
     private User owner;
 
+    public Order() { }
+
     public Order(BigDecimal fullPrice, LocalDateTime dateCreation,
                  LocalDateTime dateClosing, OrderStatus status, Integer appliedDiscount) {
         this.fullPrice = fullPrice;
@@ -24,16 +25,6 @@ public class Order implements Serializable {
         this.dateClosing = dateClosing;
         this.status = status;
         this.appliedDiscount = appliedDiscount;
-    }
-
-    public Order(OrderEntity entity) {
-        id = entity.getId();
-        fullPrice = entity.getFullPrice();
-        dateCreation = entity.getDateCreation();
-        dateClosing = entity.getDateClosing();
-        status = entity.getStatus();
-        appliedDiscount = entity.getAppliedDiscount();
-        owner = new User(entity.getOwner());
     }
 
     public Long getId() {
@@ -90,18 +81,6 @@ public class Order implements Serializable {
 
     public void setAppliedDiscount(Integer appliedDiscount) {
         this.appliedDiscount = appliedDiscount;
-    }
-
-    public OrderEntity toEntity() {
-        OrderEntity entity = new OrderEntity();
-        entity.setId(id);
-        entity.setFullPrice(fullPrice);
-        entity.setDateCreation(dateCreation);
-        entity.setDateClosing(dateClosing);
-        entity.setStatus(status);
-        entity.setAppliedDiscount(appliedDiscount);
-
-        return entity;
     }
 
     @Override

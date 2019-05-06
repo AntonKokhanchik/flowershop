@@ -1,7 +1,5 @@
 package flowershop.frontend.dto;
 
-import flowershop.backend.entity.UserEntity;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -24,28 +22,6 @@ public class User implements Serializable {
         this.fullName = fullName;
         this.address = address;
         this.phone = phone;
-    }
-
-    public User(UserEntity user) {
-        login = user.getLogin();
-        password = user.getPassword();
-        fullName = user.getFullName();
-        address = user.getAddress();
-        phone = user.getPhone();
-        balance = user.getBalance();
-        discount = user.getDiscount();
-    }
-
-    public UserEntity toEntity() {
-        UserEntity entity = new UserEntity();
-        entity.setLogin(login);
-        entity.setPassword(password);
-        entity.setFullName(fullName);
-        entity.setAddress(address);
-        entity.setPhone(phone);
-        entity.setBalance(balance);
-        entity.setDiscount(discount);
-        return entity;
     }
 
     public String getLogin() {

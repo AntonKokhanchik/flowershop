@@ -8,7 +8,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "USERS")
-@NamedQuery(name = "getAllUsers", query = "Select c from UserEntity c")
 public class UserEntity implements Serializable {
     @Id
     private String login;

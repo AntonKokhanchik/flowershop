@@ -11,7 +11,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "ORDERS")
-@NamedQuery(name = "getAllOrders", query = "Select c from OrderEntity c")
 public class OrderEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

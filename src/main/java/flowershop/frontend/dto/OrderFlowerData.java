@@ -72,7 +72,7 @@ public class OrderFlowerData implements Serializable {
      * @return flower price multiplied by number
      */
     public BigDecimal getFullPrice() {
-        return price.multiply(new BigDecimal(count));
+        return price.multiply(BigDecimal.valueOf(count));
     }
 
     public Order getOrder() {

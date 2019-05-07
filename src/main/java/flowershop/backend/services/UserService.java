@@ -15,7 +15,7 @@ public interface UserService {
      *
      * @param user user to add
      */
-    void create(User user) throws UserValidationException;
+    void create(User user);
 
     /**
      * Update corresponding user object in database
@@ -27,9 +27,9 @@ public interface UserService {
     /**
      * Delete corresponding user object from database
      *
-     * @param user user to delete
+     * @param login user login to delete
      */
-    void delete(User user);
+    void delete(String login);
 
     /**
      * Find user in database with given login

@@ -6,13 +6,13 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "FLOWERS")
-@NamedQuery(name = "getAllFlowers", query = "from FlowerEntity where lower(name) like lower(:name) and price < :price_max and price > :price_min")
 public class FlowerEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private BigDecimal price;
+    @Column(name = "flower_count")
     private Integer count;
 
 
@@ -51,7 +51,7 @@ public class FlowerEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "Flower{" +
+        return "FlowerEntity{" +
                 "name='" + name + '\'' +
                 ", price=" + price +
                 ", count=" + count +

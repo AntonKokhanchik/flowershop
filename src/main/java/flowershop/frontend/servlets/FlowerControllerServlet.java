@@ -108,7 +108,7 @@ public class FlowerControllerServlet extends HttpServlet {
             case FLOWER_DELETE:
                 if (isAccessGranted(req)) {
                     Long id = getIdParam(req);
-                    flowerService.delete(flowerService.find(id));
+                    flowerService.delete(id);
                     break;
                 }
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -186,6 +186,9 @@ public class FlowerControllerServlet extends HttpServlet {
         String param = req.getParameter("sort");
         String sort = param == null || param.equals("") ? "name" : param;
 
+        param = req.getParameter("order");
+        String order = param == null || param.equals("") ? "asc" : param;
+
         param = req.getParameter("price_min");
         BigDecimal priceMin = (param == null || param.equals("")) ? BigDecimal.ZERO : new BigDecimal(param);
 
@@ -195,7 +198,7 @@ public class FlowerControllerServlet extends HttpServlet {
         param = req.getParameter("name");
         String name = (param == null || param.equals("")) ? "%" : String.format("%%%s%%", param);
 
-        return flowerService.getAll(sort, req.getParameter("order"), name, priceMin, priceMax);
+        return flowerService.getAll(sort, order, name, priceMin, priceMax);
     }
 
     private void refreshSessionUser(HttpServletRequest req) {

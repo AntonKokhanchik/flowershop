@@ -144,9 +144,9 @@ public class OrderControllerServlet extends HttpServlet {
                 Order order = orderService.find(getIdParam(req));
 
                 if (user.getLogin().equals(order.getOwner().getLogin()) && user.getBalance().compareTo(order.getFullPrice()) >= 0) {
-                        orderService.pay(order);
-                        req.getSession().setAttribute(SessionAttribute.USER.getValue(), userService.find(user.getLogin()));
-                    }
+                    orderService.pay(order);
+                    req.getSession().setAttribute(SessionAttribute.USER.getValue(), userService.find(user.getLogin()));
+                }
 
                 resp.sendRedirect(Path.ORDER_INDEX.getValue());
                 return;
@@ -167,7 +167,7 @@ public class OrderControllerServlet extends HttpServlet {
             case ORDER_DELETE:
                 if (isAccessGranted(req)) {
                     Long id = getIdParam(req);
-                    orderService.delete(orderService.find(id));
+                    orderService.delete(id);
 
                     resp.sendRedirect(Path.ORDER_INDEX.getValue());
                     return;

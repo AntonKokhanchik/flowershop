@@ -1,11 +1,10 @@
 package flowershop.backend.services;
 
-import flowershop.backend.dao.FlowerDAO;
-import flowershop.backend.dao.OrderDAO;
-import flowershop.backend.dao.UserDAO;
+import flowershop.backend.repository.FlowerRepository;
+import flowershop.backend.repository.OrderRepository;
+import flowershop.backend.repository.UserRepository;
 import flowershop.frontend.dto.Flower;
 import flowershop.frontend.dto.OrderFlowerData;
-import flowershop.backend.entity.FlowerEntity;
 import flowershop.backend.entity.OrderFlowerDataEntity;
 import flowershop.backend.enums.OrderStatus;
 import flowershop.frontend.dto.Order;
@@ -29,11 +28,11 @@ public class OrderServiceImpl implements OrderService {
     private static final Logger LOG = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
-    private OrderDAO orderDAO;
+    private OrderRepository orderRepository;
     @Autowired
-    private FlowerDAO flowerDAO;
+    private FlowerRepository flowerRepository;
     @Autowired
-    private UserDAO userDAO;
+    private UserRepository userRepository;
     @Autowired
     private Mapper mapper;
 
@@ -48,79 +47,89 @@ public class OrderServiceImpl implements OrderService {
         // decrease flowers count
         // TODO: здесь надо продумать изменение количества цветов между созданием корзины и созданием заказа
         for (Map.Entry<Long, Integer> item : cart.getItems().entrySet()) {
-            FlowerEntity flower = flowerDAO.find(item.getKey());
-            flower.setCount(flower.getCount() - item.getValue());
+            try {
+                flowerRepository.findById(item.getKey()).ifPresent(flowerEntity -> {
+                    flowerEntity.setCount(flowerEntity.getCount() - item.getValue());
 
-            if (flower.getCount() < 0)
-                throw new FlowerValidationException(FlowerValidationException.NOT_ENOUGH_FLOWERS);
-            flowerDAO.update(flower);
+                    if (flowerEntity.getCount() < 0)
+                        throw new RuntimeException(FlowerValidationException.NOT_ENOUGH_FLOWERS);
+
+                    flowerRepository.save(flowerEntity);
+                });
+            } catch (RuntimeException e) {
+                throw new FlowerValidationException(e.getMessage());
+            }
         }
 
         DetailedCart detailedCart = generateDetailedCart(cart);
 
         // create order
-        OrderEntity order = mapper.map(
+        OrderEntity orderEntity = mapper.map(
                 new Order(
-                    detailedCart.getResult(user.getDiscount()),
-                    LocalDateTime.now(),
-                    null,
-                    OrderStatus.CREATED,
-                    user.getDiscount()
+                        detailedCart.getResult(user.getDiscount()),
+                        LocalDateTime.now(),
+                        null,
+                        OrderStatus.CREATED,
+                        user.getDiscount()
                 ), OrderEntity.class);
 
         // add flower data
         for (OrderFlowerData f : detailedCart.getItems()) {
             OrderFlowerDataEntity fe = mapper.map(f, OrderFlowerDataEntity.class);
-            order.addFlowerData(fe);
+            orderEntity.addFlowerData(fe);
         }
 
         // set owner
-        UserEntity userEntity = userDAO.find(user.getLogin());
-        order.setOwner(userEntity);
+        userRepository.findById(user.getLogin()).ifPresent(userEntity -> {
+            orderEntity.setOwner(userEntity);
 
-        // save
-        orderDAO.create(order);
+            // save
+            OrderEntity savedOrder = orderRepository.save(orderEntity);
+            LOG.info("Order created: {}", savedOrder);
+        });
     }
 
     @Override
     public void pay(Order order) {
-        OrderEntity orderEntity = orderDAO.find(order.getId());
-        UserEntity owner = orderEntity.getOwner();
+        orderRepository.findById(order.getId()).ifPresent(orderEntity -> {
+            UserEntity owner = orderEntity.getOwner();
 
-        owner.setBalance(owner.getBalance().subtract(orderEntity.getFullPrice()));
-        userDAO.update(owner);
+            owner.setBalance(owner.getBalance().subtract(orderEntity.getFullPrice()));
+            userRepository.save(owner);
 
-        orderEntity.setStatus(OrderStatus.PAID);
-        orderDAO.update(orderEntity);
-
-        LOG.info("Order {} paid", order);
+            orderEntity.setStatus(OrderStatus.PAID);
+            orderEntity = orderRepository.save(orderEntity);
+            LOG.info("Order {} paid", orderEntity);
+        });
     }
 
     @Override
     public void close(Order order) {
-        OrderEntity orderEntity = orderDAO.find(order.getId());
+        orderRepository.findById(order.getId()).ifPresent(orderEntity -> {
+            orderEntity.setStatus(OrderStatus.CLOSED);
+            orderEntity.setDateClosing(LocalDateTime.now());
 
-        orderEntity.setStatus(OrderStatus.CLOSED);
-        orderEntity.setDateClosing(LocalDateTime.now());
-        orderDAO.update(orderEntity);
+            orderEntity = orderRepository.save(orderEntity);
+            LOG.info("Order {} closed", orderEntity);
+        });
     }
 
     @Override
-    public void delete(Order order) {
-        orderDAO.delete(mapper.map(order, OrderEntity.class));
+    public void delete(Long id) {
+        orderRepository.deleteById(id);
+        LOG.info("Order with id {} deleted", id);
     }
 
     @Override
     public Order find(Long id) {
-        return mapper.map(orderDAO.find(id), Order.class);
+        return mapper.map(orderRepository.findById(id).orElse(null), Order.class);
     }
 
     @Override
     public List<Order> getAll() {
-        List<OrderEntity> entities = orderDAO.getAll();
         List<Order> orders = new LinkedList<>();
 
-        for (OrderEntity e : entities)
+        for (OrderEntity e : orderRepository.findAll())
             orders.add(mapper.map(e, Order.class));
 
         return orders;
@@ -129,13 +138,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public List<Order> getByUser(User user) {
-        UserEntity userEntity = userDAO.find(user.getLogin());
-        List<OrderEntity> entities = userEntity.getOrders();
-
         List<Order> orders = new LinkedList<>();
 
-        for (OrderEntity e : entities)
-            orders.add(mapper.map(e, Order.class));
+        userRepository.findById(user.getLogin()).ifPresent(orderEntity -> {
+            List<OrderEntity> entities = orderEntity.getOrders();
+
+            for (OrderEntity e : entities)
+                orders.add(mapper.map(e, Order.class));
+        });
 
         return orders;
     }
@@ -143,13 +153,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public List<OrderFlowerData> getFlowersData(Order order) {
-        OrderEntity entity = orderDAO.find(order.getId());
-        List<OrderFlowerDataEntity> entities = entity.getFlowersData();
-
         List<OrderFlowerData> flowersData = new LinkedList<>();
 
-        for (OrderFlowerDataEntity e : entities)
-            flowersData.add(mapper.map(e, OrderFlowerData.class));
+        orderRepository.findById(order.getId()).ifPresent(orderEntity -> {
+            List<OrderFlowerDataEntity> entities = orderEntity.getFlowersData();
+
+            for (OrderFlowerDataEntity e : entities)
+                flowersData.add(mapper.map(e, OrderFlowerData.class));
+        });
 
         return flowersData;
     }
@@ -159,7 +170,7 @@ public class OrderServiceImpl implements OrderService {
         Set<OrderFlowerData> items = new HashSet<>();
 
         for (Map.Entry<Long, Integer> entry : cart.getItems().entrySet())
-            items.add(mapper.map(flowerDAO.find(entry.getKey()), Flower.class).toOrderData(entry.getValue()));
+            items.add(mapper.map(flowerRepository.findById(entry.getKey()).orElse(null), Flower.class).toOrderData(entry.getValue()));
 
         return new DetailedCart(items);
     }

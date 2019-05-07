@@ -43,9 +43,9 @@ public interface OrderService {
     /**
      * Delete corresponding order object from database
      *
-     * @param order order to delete
+     * @param id order id to delete
      */
-    void delete(Order order);
+    void delete(Long id);
 
     /**
      * Find order in database with given id

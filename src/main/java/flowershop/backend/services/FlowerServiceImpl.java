@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.dao.FlowerDAO;
+import flowershop.backend.repository.FlowerRepository;
 import flowershop.frontend.dto.Flower;
 import flowershop.backend.entity.FlowerEntity;
 import flowershop.backend.exception.FlowerValidationException;
@@ -8,6 +8,7 @@ import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,7 @@ import java.util.List;
 public class FlowerServiceImpl implements FlowerService {
     private static final Logger LOG = LoggerFactory.getLogger(FlowerServiceImpl.class);
     @Autowired
-    private FlowerDAO flowerDAO;
+    private FlowerRepository flowerRepository;
 
     @Autowired
     private Mapper mapper;
@@ -34,39 +35,45 @@ public class FlowerServiceImpl implements FlowerService {
     public void create(Flower flower) throws FlowerValidationException {
         validate(flower);
 
-        flowerDAO.create(mapper.map(flower, FlowerEntity.class));
+        FlowerEntity savedFlower = flowerRepository.save(mapper.map(flower, FlowerEntity.class));
+        LOG.info("Flower created: {}", savedFlower);
     }
 
     @Override
     @Transactional
     public void update(Flower flower) throws FlowerValidationException {
         validate(flower);
-        flowerDAO.update(mapper.map(flower, FlowerEntity.class));
+
+        FlowerEntity savedFlower = flowerRepository.save(mapper.map(flower, FlowerEntity.class));
+        LOG.info("Flower updated: {}", savedFlower);
     }
 
     @Override
     @Transactional
-    public void delete(Flower flower) {
-        flowerDAO.delete(mapper.map(flower, FlowerEntity.class));
+    public void delete(Long id) {
+        flowerRepository.deleteById(id);
+        LOG.info("Flower with id {} deleted", id);
     }
 
     @Override
     public Flower find(Long id) {
-        return mapper.map(flowerDAO.find(id), Flower.class);
+        return mapper.map(flowerRepository.findById(id).orElse(null), Flower.class);
     }
 
     public List<Flower> getAll() {
-        List<FlowerEntity> entities = flowerDAO.getAll();
         List<Flower> flowers = new LinkedList<>();
 
-        for (FlowerEntity e : entities)
+        for (FlowerEntity e : flowerRepository.findAll())
             flowers.add(mapper.map(e, Flower.class));
 
-        return flowers;}
+        return flowers;
+    }
 
     @Override
-    public List<Flower> getAll(String sort, String order, String name, BigDecimal priceMin, BigDecimal priceMax) {
-        List<FlowerEntity> entities = flowerDAO.getAll(sort, order, name, priceMin, priceMax);
+    public List<Flower> getAll(String name, BigDecimal priceMin, BigDecimal priceMax, String sort, String order) {
+        List<FlowerEntity> entities = flowerRepository.findByNameAndPriceSorted(name, priceMin, priceMax,
+                Sort.by(Sort.Direction.fromString(order), sort));
+
         List<Flower> flowers = new LinkedList<>();
 
         for (FlowerEntity e : entities)

@@ -79,18 +79,13 @@ public class UserControllerServlet extends HttpServlet {
                 resp.sendRedirect(Path.LOGIN.getValue());
                 return;
 
-            case REGISTER:
-                try {
-                    User user = parseUser(req);
-                    userService.create(user);
-                } catch (UserValidationException e) {
-                    handleValidationError(e, req);
+            case REGISTER: {
+                User user = parseUser(req);
+                userService.create(user);
 
-                    req.getRequestDispatcher(path.getPage()).forward(req, resp);
-                    return;
-                }
                 resp.sendRedirect(Path.LOGIN.getValue());
                 return;
+            }
 
             case LOGIN:
                 User user;

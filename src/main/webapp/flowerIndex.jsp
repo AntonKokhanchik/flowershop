@@ -15,27 +15,27 @@
                 <div class="input-group col">
                     <label class="m-2"> Sort: </label>
                     <select class="form-control" name="sort">
-                        <option value="name" ${sort == null || sort == 'name' ? 'selected' : ''}> Name </option>
-                        <option value="price" ${sort == 'price' ? 'selected' : ''}> Price </option>
-                        <option value="count" ${sort == 'count' ? 'selected' : ''}> Count </option>
+                        <option value="name" ${sort == null || sort == "name" ? "selected" : ""}> Name </option>
+                        <option value="price" ${sort == "price" ? "selected" : ""}> Price </option>
+                        <option value="flower_count" ${sort == "flower_count" ? "selected" : ""}> Count </option>
                     </select>
                 </div>
                 <div class="input-group col">
                     <label  class="m-2"> Order: </label>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" name="order" id="order_asc" type="radio" value="asc" ${order == null || order == 'asc' ? 'checked' : ''} />
-                        <label class="form-check-label" for='order_asc'> Asc </label>
+                        <input class="form-check-input" name="order" id="order_asc" type="radio" value="asc" ${order == null || order == "asc" ? "checked" : ""} />
+                        <label class="form-check-label" for="order_asc"> Asc </label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" name="order" id="order_desc" type="radio" value="desc" ${order == 'desc' ? 'checked' : ''} />
-                        <label class="form-check-label" for='order_desc'> Desc </label>
+                        <input class="form-check-input" name="order" id="order_desc" type="radio" value="desc" ${order == "desc" ? "checked" : ""} />
+                        <label class="form-check-label" for="order_desc"> Desc </label>
                     </div>
                 </div>
             </div>
             <div class="form-row">
                 <div class="input-group col">
-                    <label for="name"> Search: </label>
-                    <input class="form-control m-2" name="name" placeholder="Search name" value="${name}"/>
+                    <label class="m-2" for="name"> Search: </label>
+                    <input class="form-control" name="name" placeholder="Search name" value="${name}"/>
                 </div>
                 <div class="input-group col">
                     <input class="form-control" name="price_min" placeholder="Min price" value="${price_min}"/>

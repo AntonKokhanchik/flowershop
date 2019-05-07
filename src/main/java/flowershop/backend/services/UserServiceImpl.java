@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.dao.UserDAO;
+import flowershop.backend.repository.UserRepository;
 import flowershop.frontend.dto.User;
 import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.UserValidationException;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private JmsMessageService jmsMessageService;
 
     @Autowired
-    private UserDAO userDAO;
+    private UserRepository userRepository;
 
     @Autowired
     private Mapper mapper;
@@ -38,11 +38,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void create(User user) throws UserValidationException {
+    public void create(User user) {
         user.setBalance(new BigDecimal(2000));
         user.setDiscount(0);
 
-        userDAO.create(mapper.map(user, UserEntity.class));
+        UserEntity savedUser = userRepository.save(mapper.map(user, UserEntity.class));
+        LOG.info("User created: {}", savedUser);
 
         createXML(user);
         jmsMessageService.sendNewUserSql(user);
@@ -50,34 +51,36 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void update(User user) {
-        UserEntity userEntity = userDAO.find(user.getLogin());
+        userRepository.findById(user.getLogin()).ifPresent(userEntity -> {
+            userEntity.setPassword(user.getPassword());
+            userEntity.setFullName(user.getFullName());
+            userEntity.setAddress(user.getAddress());
+            userEntity.setPhone(user.getPhone());
+            userEntity.setDiscount(user.getDiscount());
+            userEntity.setBalance(user.getBalance());
 
-        userEntity.setPassword(user.getPassword());
-        userEntity.setFullName(user.getFullName());
-        userEntity.setAddress(user.getAddress());
-        userEntity.setPhone(user.getPhone());
-        userEntity.setDiscount(user.getDiscount());
-        userEntity.setBalance(user.getBalance());
-
-        userDAO.update(userEntity);
+            userEntity = userRepository.save(userEntity);
+            LOG.info("User updated to {}", userEntity);
+        });
     }
 
     @Override
-    public void delete(User user) {
-        userDAO.delete(mapper.map(user, UserEntity.class));
+    public void delete(String login) {
+        userRepository.deleteById(login);
+        LOG.info("User with login {} deleted", login);
     }
 
     @Override
     public User find(String login) {
-        return mapper.map(userDAO.find(login), User.class);
+        return mapper.map(userRepository.findById(login).orElse(null), User.class);
     }
 
     @Override
     public List<User> getAll() {
-        List<UserEntity> entities = userDAO.getAll();
+        List<UserEntity> entities = userRepository.findAll();
         List<User> users = new LinkedList<>();
 
-        for(UserEntity e : entities)
+        for (UserEntity e : entities)
             users.add(mapper.map(e, User.class));
 
         return users;
@@ -85,16 +88,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User verify(User user) throws UserValidationException {
-        UserEntity userEntity = userDAO.find(user.getLogin());
+        UserEntity userEntity = userRepository.findById(user.getLogin()).orElse(null);
 
-        if(userEntity == null)
+        if (userEntity == null)
             throw new UserValidationException(UserValidationException.WRONG_LOGIN);
 
         if (!user.getPassword().equals(userEntity.getPassword()))
             throw new UserValidationException(UserValidationException.WRONG_PASSWORD);
 
         LOG.info("User logged in: {}", userEntity);
-
         return mapper.map(userEntity, User.class);
     }
 
@@ -102,8 +104,9 @@ public class UserServiceImpl implements UserService {
     // TODO: брать путь для создания xml из конфига
     public void createXML(User user) {
         try {
-            converter.convertFromObjectToXML(user, "userXML/user_"+user.getLogin()+".xml");
-            LOG.info("user {}.xml created", user.getLogin());
+            String filepath = "userXML/user_" + user.getLogin() + ".xml";
+            converter.convertFromObjectToXML(user, filepath);
+            LOG.info("file {} created", filepath);
         } catch (IOException e) {
             LOG.error("Failed to convert to xml", e);
         }

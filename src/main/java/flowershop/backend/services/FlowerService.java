@@ -28,15 +28,15 @@ public interface FlowerService {
     /**
      * Delete corresponding flower object from database
      *
-     * @param flower flower to delete
+     * @param id flower id to delete
      */
-    void delete(Flower flower);
+    void delete(Long id);
 
     /**
      * Find flower in database with given id
      *
      * @param id flower id
-     * @return  Flower dto
+     * @return Flower dto
      */
     Flower find(Long id);
 
@@ -47,5 +47,14 @@ public interface FlowerService {
      */
     List<Flower> getAll();
 
-    List<Flower> getAll(String sort, String order, String name, BigDecimal price_min, BigDecimal price_max);
+    /**
+     * Get all flowers with searched name substring, price between min and max, sorted
+     * @param name searched substring
+     * @param priceMin min price
+     * @param priceMax max price
+     * @param sort sort field
+     * @param order order (direction) sorting (asc or desc)
+     * @return founded flowers result list
+     */
+    List<Flower> getAll(String name, BigDecimal priceMin, BigDecimal priceMax, String sort, String order);
 }

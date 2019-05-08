@@ -196,7 +196,7 @@ public class FlowerControllerServlet extends HttpServlet {
         BigDecimal priceMax = (param == null || param.equals("")) ? BigDecimal.valueOf(Long.MAX_VALUE) : new BigDecimal(param);
 
         param = req.getParameter("name");
-        String name = (param == null || param.equals("")) ? "%" : String.format("%%%s%%", param);
+        String name = param == null ? "" : param;
 
         return flowerService.getAll(name, priceMin, priceMax, sort, order);
     }

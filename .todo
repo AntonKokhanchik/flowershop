@@ -215,7 +215,7 @@
         К нему же прикручивается построитель критериев к задаче выше - QueryDsl
 
 TODO:[ ] [08.05.19]
-    [ ] SqlCriteriaBuilder (QueryDsl + JPARepository)
+    [x] SqlCriteriaBuilder (QueryDsl + JPARepository)
     [ ] Юнит-тесты, интеграционные тесты (restTemplate)
     [ ] Проверка прав юзера кастомной аннотацией + AOP
     [ ] Кэширование с помощью ehcache

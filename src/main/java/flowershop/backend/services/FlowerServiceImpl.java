@@ -1,5 +1,6 @@
 package flowershop.backend.services;
 
+import flowershop.backend.entity.QFlowerEntity;
 import flowershop.backend.repository.FlowerRepository;
 import flowershop.frontend.dto.Flower;
 import flowershop.backend.entity.FlowerEntity;
@@ -71,8 +72,12 @@ public class FlowerServiceImpl implements FlowerService {
 
     @Override
     public List<Flower> getAll(String name, BigDecimal priceMin, BigDecimal priceMax, String sort, String order) {
-        List<FlowerEntity> entities = flowerRepository.findByNameAndPriceSorted(name, priceMin, priceMax,
-                Sort.by(Sort.Direction.fromString(order), sort));
+        QFlowerEntity flower = QFlowerEntity.flowerEntity;
+
+        List<FlowerEntity> entities = (List<FlowerEntity>) flowerRepository.findAll(
+                flower.name.containsIgnoreCase(name).and(flower.price.between(priceMin, priceMax)),
+                Sort.by(Sort.Direction.fromString(order), sort)
+        );
 
         List<Flower> flowers = new LinkedList<>();
 

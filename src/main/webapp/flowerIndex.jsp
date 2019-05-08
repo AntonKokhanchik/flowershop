@@ -17,7 +17,7 @@
                     <select class="form-control" name="sort">
                         <option value="name" ${sort == null || sort == "name" ? "selected" : ""}> Name </option>
                         <option value="price" ${sort == "price" ? "selected" : ""}> Price </option>
-                        <option value="flower_count" ${sort == "flower_count" ? "selected" : ""}> Count </option>
+                        <option value="count" ${sort == "count" ? "selected" : ""}> Count </option>
                     </select>
                 </div>
                 <div class="input-group col">

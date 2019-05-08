@@ -85,6 +85,19 @@
       <version>2.1.6.RELEASE</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-apt</artifactId>
+      <version>4.2.1</version>
+      <classifier>jpa</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-jpa</artifactId>
+      <version>4.2.1</version>
+    </dependency>
+
     <!--  Database  -->
     <dependency>
       <groupId>org.hibernate</groupId>

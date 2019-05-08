@@ -198,7 +198,7 @@ public class FlowerControllerServlet extends HttpServlet {
         param = req.getParameter("name");
         String name = (param == null || param.equals("")) ? "%" : String.format("%%%s%%", param);
 
-        return flowerService.getAll(sort, order, name, priceMin, priceMax);
+        return flowerService.getAll(name, priceMin, priceMax, sort, order);
     }
 
     private void refreshSessionUser(HttpServletRequest req) {

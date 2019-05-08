@@ -200,20 +200,24 @@
         [x] а) send xml representation of customer entity to out queue when new customer registers
     	[x] b) receive new discount request object (customerId, newDiscount) in XML format to change customers discount
 
+[x] [30.04.19 15:44]
+    [x] разбить application-context.xml на несколько частей
+        например вынести все что связано c jms в отдльный файл
+    [x] пакет dto перенести в frontend
+    [x] flowershop.webService.rest.LoginCheckService - полная аналогия с сервлетами.
+        Не очень хорошо из контроллера сразу в DAO
+        нужна трехзвенная связь
+    [x] flowershop.webService.FlowersStockServiceImpl <-> flowerDAO аналогично
+    [x] сделать маппинг dto - entity с помощью отдельного сервиса маппера (dozer)
+    [x] сделать возможность поиска по отдельным критериям по ассортименту цветов на стороне бэкенда.
+        Т.е. с фронта должен прилетать какой-то фильтр, например по цене, цвету, типу цветка (возможны любые комбинации критериев) и бэк должен фильтровать на уровне sql запросы
+    [x] прикрутить альтернативную реализацию DAO - с помощью SpringData. Здесь погуглить CrudRepository
+        К нему же прикручивается построитель критериев к задаче выше - QueryDsl
 
-
-TODO:
-    [ ] [30.04.19 15:44]
-        [x] разбить application-context.xml на несколько частей
-            например вынести все что связано c jms в отдльный файл
-        [x] пакет dto перенести в frontend
-        [x] flowershop.webService.rest.LoginCheckService - полная аналогия с сервлетами.
-            Не очень хорошо из контроллера сразу в DAO
-            нужна трехзвенная связь
-        [x] flowershop.webService.FlowersStockServiceImpl <-> flowerDAO аналогично
-        [x] сделать маппинг dto - entity с помощью отдельного сервиса маппера (dozer)
-        [x] сделать возможность поиска по отдельным критериям по ассортименту цветов на стороне бэкенда.
-            Т.е. с фронта должен прилетать какой-то фильтр, например по цене, цвету, типу цветка (возможны любые комбинации критериев) и бэк должен фильтровать на уровне sql запросы
-        [x] прикрутить альтернативную реализацию DAO - с помощью SpringData. Здесь погуглить CrudRepository
-         ?  К нему же прикручивается построитель критериев к задаче выше - QueryDsl
-
+TODO:[ ] [08.05.19]
+    [ ] SqlCriteriaBuilder (QueryDsl + JPARepository)
+    [ ] Юнит-тесты, интеграционные тесты (restTemplate)
+    [ ] Проверка прав юзера кастомной аннотацией + AOP
+    [ ] Кэширование с помощью ehcache
+    [ ] SpringBoot + docker
+    [ ] Gradle

@@ -3,9 +3,10 @@ package flowershop.frontend.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import flowershop.backend.enums.OrderStatus;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Order implements Serializable {
     private Long id;
@@ -18,12 +19,11 @@ public class Order implements Serializable {
 
     public Order() { }
 
-    public Order(BigDecimal fullPrice, LocalDateTime dateCreation,
-                 LocalDateTime dateClosing, OrderStatus status, Integer appliedDiscount) {
+    public Order(BigDecimal fullPrice, Integer appliedDiscount) {
         this.fullPrice = fullPrice;
-        this.dateCreation = dateCreation;
-        this.dateClosing = dateClosing;
-        this.status = status;
+        this.dateCreation = LocalDateTime.now();
+        this.dateClosing = null;
+        this.status = OrderStatus.CREATED;
         this.appliedDiscount = appliedDiscount;
     }
 
@@ -86,19 +86,31 @@ public class Order implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
+
         Order order = (Order) o;
-        return Objects.equals(id, order.id) &&
-                Objects.equals(fullPrice, order.fullPrice) &&
-                Objects.equals(dateCreation, order.dateCreation) &&
-                Objects.equals(dateClosing, order.dateClosing) &&
-                status == order.status &&
-                Objects.equals(appliedDiscount, order.appliedDiscount);
+
+        return new EqualsBuilder()
+                .append(id, order.id)
+                .append(fullPrice, order.fullPrice)
+                .append(dateCreation, order.dateCreation)
+                .append(dateClosing, order.dateClosing)
+                .append(status, order.status)
+                .append(appliedDiscount, order.appliedDiscount)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fullPrice, dateCreation, dateClosing, status, appliedDiscount);
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(fullPrice)
+                .append(dateCreation)
+                .append(dateClosing)
+                .append(status)
+                .append(appliedDiscount)
+                .toHashCode();
     }
 
     @Override

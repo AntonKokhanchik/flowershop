@@ -1,8 +1,10 @@
 package flowershop.frontend.dto;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Objects;
 
 public class User implements Serializable {
     private String login;
@@ -87,20 +89,33 @@ public class User implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
+
         User user = (User) o;
-        return Objects.equals(login, user.login) &&
-                Objects.equals(password, user.password) &&
-                Objects.equals(fullName, user.fullName) &&
-                Objects.equals(address, user.address) &&
-                Objects.equals(phone, user.phone) &&
-                Objects.equals(balance, user.balance) &&
-                Objects.equals(discount, user.discount);
+
+        return new EqualsBuilder()
+                .append(login, user.login)
+                .append(password, user.password)
+                .append(fullName, user.fullName)
+                .append(address, user.address)
+                .append(phone, user.phone)
+                .append(balance, user.balance)
+                .append(discount, user.discount)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(login, password, fullName, address, phone, balance, discount);
+        return new HashCodeBuilder(17, 37)
+                .append(login)
+                .append(password)
+                .append(fullName)
+                .append(address)
+                .append(phone)
+                .append(balance)
+                .append(discount)
+                .toHashCode();
     }
 
     @Override

@@ -65,13 +65,8 @@ public class OrderServiceImpl implements OrderService {
 
         // create order
         OrderEntity orderEntity = mapper.map(
-                new Order(
-                        detailedCart.getResult(user.getDiscount()),
-                        LocalDateTime.now(),
-                        null,
-                        OrderStatus.CREATED,
-                        user.getDiscount()
-                ), OrderEntity.class);
+                new Order(detailedCart.getResult(user.getDiscount()), user.getDiscount()),
+                OrderEntity.class);
 
         // add flower data
         for (OrderFlowerData f : detailedCart.getItems()) {

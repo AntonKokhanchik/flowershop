@@ -24,7 +24,7 @@ public class Cart implements Serializable {
     }
 
     public void setItems(Map<Long, Integer> items) {
-        this.items = (HashMap) items;
+        this.items = (HashMap<Long, Integer>) items;
     }
 
     /**

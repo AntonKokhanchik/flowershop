@@ -1,10 +1,11 @@
 package flowershop.frontend.dto;
 
 import flowershop.backend.entity.OrderFlowerDataEntity;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Objects;
 
 /**
  * DTO for OrderFlowerDataEntity
@@ -86,17 +87,27 @@ public class OrderFlowerData implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
+
         OrderFlowerData that = (OrderFlowerData) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(flowerName, that.flowerName) &&
-                Objects.equals(price, that.price) &&
-                Objects.equals(count, that.count);
+
+        return new EqualsBuilder()
+                .append(id, that.id)
+                .append(flowerName, that.flowerName)
+                .append(price, that.price)
+                .append(count, that.count)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, flowerName, price, count);
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(flowerName)
+                .append(price)
+                .append(count)
+                .toHashCode();
     }
 
     @Override

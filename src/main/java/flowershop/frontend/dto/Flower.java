@@ -1,8 +1,10 @@
 package flowershop.frontend.dto;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Objects;
 
 public class Flower implements Serializable {
     private Long id;
@@ -58,17 +60,27 @@ public class Flower implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
+
         Flower flower = (Flower) o;
-        return Objects.equals(id, flower.id) &&
-                Objects.equals(name, flower.name) &&
-                Objects.equals(price, flower.price) &&
-                Objects.equals(count, flower.count);
+
+        return new EqualsBuilder()
+                .append(id, flower.id)
+                .append(name, flower.name)
+                .append(price, flower.price)
+                .append(count, flower.count)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price, count);
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(name)
+                .append(price)
+                .append(count)
+                .toHashCode();
     }
 
     @Override

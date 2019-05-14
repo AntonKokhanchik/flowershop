@@ -216,7 +216,7 @@
 
 TODO:[ ] [08.05.19]
     [x] SqlCriteriaBuilder (QueryDsl + JPARepository)
-    [ ] Юнит-тесты, интеграционные тесты (restTemplate)
+    [+] Юнит-тесты, интеграционные тесты (restTemplate)
     [ ] Проверка прав юзера кастомной аннотацией + AOP
     [ ] Кэширование с помощью ehcache
     [ ] SpringBoot + docker

@@ -47,18 +47,18 @@ public class OrderServiceImpl implements OrderService {
         // decrease flowers count
         // TODO: здесь надо продумать изменение количества цветов между созданием корзины и созданием заказа
         for (Map.Entry<Long, Integer> item : cart.getItems().entrySet()) {
-            try {
-                flowerRepository.findById(item.getKey()).ifPresent(flowerEntity -> {
-                    flowerEntity.setCount(flowerEntity.getCount() - item.getValue());
+            Optional<Boolean> isExceptionNeeded = flowerRepository.findById(item.getKey()).map(flowerEntity -> {
+                flowerEntity.setCount(flowerEntity.getCount() - item.getValue());
 
-                    if (flowerEntity.getCount() < 0)
-                        throw new RuntimeException(FlowerValidationException.NOT_ENOUGH_FLOWERS);
+                if (flowerEntity.getCount() < 0)
+                    return true;
 
-                    flowerRepository.save(flowerEntity);
-                });
-            } catch (RuntimeException e) {
-                throw new FlowerValidationException(e.getMessage());
-            }
+                flowerRepository.save(flowerEntity);
+                return false;
+            });
+
+            if (isExceptionNeeded.isPresent() && isExceptionNeeded.get())
+                throw new FlowerValidationException(FlowerValidationException.NOT_ENOUGH_FLOWERS);
         }
 
         DetailedCart detailedCart = generateDetailedCart(cart);
@@ -117,7 +117,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order find(Long id) {
-        return mapper.map(orderRepository.findById(id).orElse(null), Order.class);
+        return orderRepository.findById(id).map(entity -> mapper.map(entity, Order.class)).orElse(null);
     }
 
     @Override
@@ -165,8 +165,9 @@ public class OrderServiceImpl implements OrderService {
         Set<OrderFlowerData> items = new HashSet<>();
 
         for (Map.Entry<Long, Integer> entry : cart.getItems().entrySet())
-            items.add(mapper.map(flowerRepository.findById(entry.getKey()).orElse(null), Flower.class).toOrderData(entry.getValue()));
-
+            flowerRepository.findById(entry.getKey()).ifPresent(entity ->
+                    items.add(mapper.map(entity, Flower.class).toOrderData(entry.getValue()))
+            );
         return new DetailedCart(items);
     }
 }

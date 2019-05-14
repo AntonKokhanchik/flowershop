@@ -58,7 +58,7 @@ public class FlowerServiceImpl implements FlowerService {
 
     @Override
     public Flower find(Long id) {
-        return mapper.map(flowerRepository.findById(id).orElse(null), Flower.class);
+        return flowerRepository.findById(id).map(entity -> mapper.map(entity, Flower.class)).orElse(null);
     }
 
     public List<Flower> getAll() {

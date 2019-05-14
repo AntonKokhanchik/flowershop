@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User find(String login) {
-        return mapper.map(userRepository.findById(login).orElse(null), User.class);
+        return userRepository.findById(login).map(entity -> mapper.map(entity, User.class)).orElse(null);
     }
 
     @Override

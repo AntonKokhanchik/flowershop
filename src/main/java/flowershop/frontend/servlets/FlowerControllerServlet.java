@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(urlPatterns = {"/", "/flower/*"})
+@WebServlet(urlPatterns = {"/flower/*"}, loadOnStartup = 1)
 public class FlowerControllerServlet extends HttpServlet {
     @Autowired
     private FlowerService flowerService;

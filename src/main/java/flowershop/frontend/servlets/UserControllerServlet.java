@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
-@WebServlet(urlPatterns = "/user/*")
+@WebServlet(urlPatterns = "/user/*", loadOnStartup = 1)
 public class UserControllerServlet extends HttpServlet {
     @Autowired
     private UserService userService;

@@ -24,9 +24,6 @@ public class UserServiceImpl implements UserService {
     private XMLConverter converter;
 
     @Autowired
-    private JmsMessageService jmsMessageService;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -46,7 +43,6 @@ public class UserServiceImpl implements UserService {
         LOG.info("User created: {}", savedUser);
 
         createXML(user);
-        jmsMessageService.sendNewUserSql(user);
     }
 
     @Override

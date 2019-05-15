@@ -2,13 +2,11 @@ package flowershop.backend.services;
 
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
-import org.springframework.stereotype.Component;
 
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 
-@Component
 public class XMLConverter {
     private Marshaller marshaller;
     private Unmarshaller unmarshaller;

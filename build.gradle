@@ -1,0 +1,88 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.4.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+
+sourceCompatibility = 12
+targetCompatibility = 12
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+//  Spring
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jersey'
+    
+//  Tomcat
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: '9.0.19'
+    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '9.0.19'
+
+//    For views
+    compile group: 'javax.servlet', name: 'jstl', version: '1.2'
+
+//    Database
+    compile group: 'com.h2database', name: 'h2', version: '1.4.199'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
+    compile group: 'com.mysema.querydsl', name: 'querydsl-apt', version: '3.7.4', classifier: 'jpa'
+    compile group: 'com.querydsl', name: 'querydsl-jpa', version: '4.2.1'
+
+//      dto <-> entity mapping
+    compile group: 'net.sf.dozer', name: 'dozer', version: '5.5.1'
+
+//   for java.time.LocalDateTime mapping
+    compile group: 'io.craftsman', name: 'dozer-jdk8-support', version: '1.0.2'
+
+//    Marshalling
+    compile group: 'org.codehaus.castor', name: 'castor-xml', version: '1.4.1'
+    compile group: 'xerces', name: 'xercesImpl', version: '2.12.0'
+    compile group: 'org.springframework', name: 'spring-oxm', version: '5.1.7.RELEASE'
+}
+
+// QueryDsl and it's code generation
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath('net.ltgt.gradle:gradle-apt-plugin:0.18')
+    }
+}
+
+apply plugin: 'net.ltgt.apt'
+apply plugin: 'net.ltgt.apt-idea'
+
+def queryDslVersion = '4.1.3'
+
+dependencies {
+    compile("com.querydsl:querydsl-core:${queryDslVersion}")
+    compile("com.querydsl:querydsl-jpa:${queryDslVersion}")
+}
+
+dependencies {
+    compile "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    annotationProcessor (
+            "com.querydsl:querydsl-apt:${queryDslVersion}:jpa",
+            "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final",
+            "javax.annotation:javax.annotation-api:1.3.2",
+    )
+}

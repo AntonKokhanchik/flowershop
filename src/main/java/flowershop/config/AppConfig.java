@@ -2,14 +2,20 @@ package flowershop.config;
 
 import flowershop.backend.services.XMLConverter;
 import org.dozer.DozerBeanMapper;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.castor.CastorMarshaller;
 
 import java.util.Arrays;
 
 @Configuration
+@ServletComponentScan(basePackages = {"flowershop.frontend.servlets"})
+@ComponentScan(basePackages = {"flowershop"})
+@PropertySource("classpath:database.properties")
 public class AppConfig {
     @Bean(name = "org.dozer.Mapper")
     public DozerBeanMapper mapper() {

@@ -94,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
 
             orderEntity.setStatus(OrderStatus.PAID);
             orderEntity = orderRepository.save(orderEntity);
-            LOG.info("Order {} paid", orderEntity);
+            LOG.info("Order paid: {}", orderEntity);
         });
     }
 
@@ -105,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
             orderEntity.setDateClosing(LocalDateTime.now());
 
             orderEntity = orderRepository.save(orderEntity);
-            LOG.info("Order {} closed", orderEntity);
+            LOG.info("Order closed {}", orderEntity);
         });
     }
 

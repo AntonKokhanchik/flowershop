@@ -5,12 +5,15 @@ import flowershop.frontend.dto.User;
 import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.UserValidationException;
 import org.dozer.Mapper;
+import org.glassfish.jersey.internal.util.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -19,6 +22,9 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(FlowerServiceImpl.class);
+
+    @Value("${flowershop.backend.services.UserService.xmlPath}")
+    private String XMLPath;
 
     @Autowired
     private XMLConverter converter;
@@ -97,10 +103,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    // TODO: брать путь для создания xml из конфига
     public void createXML(User user) {
         try {
-            String filepath = "userXML/user_" + user.getLogin() + ".xml";
+            new File(XMLPath).mkdir();
+            String filepath = XMLPath + "/user_" + user.getLogin() + ".xml";
             converter.convertFromObjectToXML(user, filepath);
             LOG.info("file {} created", filepath);
         } catch (IOException e) {

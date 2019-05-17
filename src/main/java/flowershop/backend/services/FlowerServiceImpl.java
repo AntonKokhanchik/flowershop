@@ -1,5 +1,6 @@
 package flowershop.backend.services;
 
+import com.querydsl.core.BooleanBuilder;
 import flowershop.backend.entity.QFlowerEntity;
 import flowershop.backend.repository.FlowerRepository;
 import flowershop.frontend.dto.Flower;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -74,10 +76,23 @@ public class FlowerServiceImpl implements FlowerService {
     public List<Flower> getAll(String name, BigDecimal priceMin, BigDecimal priceMax, String sort, String order) {
         QFlowerEntity flower = QFlowerEntity.flowerEntity;
 
-        List<FlowerEntity> entities = (List<FlowerEntity>) flowerRepository.findAll(
-                flower.name.containsIgnoreCase(name).and(flower.price.between(priceMin, priceMax)),
-                Sort.by(Sort.Direction.fromString(order), sort)
-        );
+        BooleanBuilder p = new BooleanBuilder();
+        if (!StringUtils.isEmpty(name))
+            p.and(flower.name.containsIgnoreCase(name));
+
+        if(priceMin != null)
+            p.and(flower.price.goe(priceMin));
+
+        if(priceMax != null)
+            p.and(flower.price.loe(priceMax));
+
+        if (StringUtils.isEmpty(sort))
+            sort="name";
+
+        if (StringUtils.isEmpty(order))
+            order="asc";
+
+        List<FlowerEntity> entities = (List<FlowerEntity>) flowerRepository.findAll(p, Sort.by(Sort.Direction.fromString(order), sort));
 
         List<Flower> flowers = new LinkedList<>();
 

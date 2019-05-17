@@ -1,5 +1,6 @@
 package flowershop.frontend.servlets;
 
+import flowershop.annotations.Secured;
 import flowershop.backend.enums.Path;
 import flowershop.backend.enums.SessionAttribute;
 import flowershop.backend.exception.FlowerValidationException;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpSession;
-import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/order")
@@ -59,6 +59,11 @@ public class OrderController {
     @GetMapping("detail/{id}")
     public String getShow(@PathVariable Long id, ModelMap model) {
         Order order = orderService.find(id);
+        User sessionUser = (User) httpSession.getAttribute(SessionAttribute.USER.getValue());
+
+        if (!sessionUser.getLogin().equals(order.getOwner().getLogin()))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+
         model.addAttribute("order", order);
         model.addAttribute("items", orderService.getFlowersData(order));
 
@@ -140,19 +145,16 @@ public class OrderController {
     }
 
     @PostMapping("close/{id}")
+    @Secured
     public String close(@PathVariable Long id) {
-        if (!isAccessGranted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-
         orderService.close(orderService.find(id));
 
         return "redirect:" + Path.ORDER_INDEX.getValue();
     }
 
     @PostMapping("delete/{id}")
+    @Secured
     public String postDelete(@PathVariable Long id) {
-        if (!isAccessGranted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         orderService.delete(id);
 
         return redirect(Path.ORDER_INDEX.getValue());
@@ -163,11 +165,6 @@ public class OrderController {
 
     private String redirect(String url) {
         return "redirect:" + url;
-    }
-
-    private boolean isAccessGranted() {
-        User user = (User) httpSession.getAttribute(SessionAttribute.USER.getValue());
-        return (user != null && user.isAdmin());
     }
 
     private void refreshSessionUser() {

@@ -1,20 +1,17 @@
 package flowershop.frontend.servlets;
 
+import flowershop.annotations.Secured;
 import flowershop.backend.enums.Path;
 import flowershop.backend.enums.SessionAttribute;
 import flowershop.backend.exception.UserValidationException;
 import flowershop.backend.services.UserService;
 import flowershop.frontend.dto.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 
 import javax.servlet.http.HttpSession;
-import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -36,10 +33,8 @@ public class UserController {
     // GET
 
     @GetMapping
+    @Secured
     public String getIndex(ModelMap model) {
-        if (!isAccessGranted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-
         model.addAttribute("users", userService.getAll());
 
         return Path.USER_INDEX.getPage();
@@ -118,11 +113,6 @@ public class UserController {
                 attrName = "anotherErrorMsg";
         }
         model.addAttribute(attrName, e.getMessage());
-    }
-
-    private boolean isAccessGranted() {
-        User user = (User) httpSession.getAttribute(SessionAttribute.USER.getValue());
-        return (user != null && user.isAdmin());
     }
 
     private void refreshSessionUser(){

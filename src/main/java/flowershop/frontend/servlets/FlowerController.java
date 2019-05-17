@@ -1,5 +1,6 @@
 package flowershop.frontend.servlets;
 
+import flowershop.annotations.Secured;
 import flowershop.backend.enums.Path;
 import flowershop.backend.enums.SessionAttribute;
 import flowershop.backend.exception.FlowerValidationException;
@@ -8,15 +9,12 @@ import flowershop.backend.services.UserService;
 import flowershop.frontend.dto.Flower;
 import flowershop.frontend.dto.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import java.util.Map;
 
 @Controller
 @RequestMapping(value = {"/", "/flower"})
@@ -73,20 +71,16 @@ public class FlowerController {
     }
 
     @GetMapping("new")
+    @Secured
     public String getNew(ModelMap model) {
-        if (!isAccessGranted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-
         model.addAttribute("action", Path.FLOWER_NEW.getValue());
 
         return Path.FLOWER_NEW.getPage();
     }
 
     @GetMapping("update/{id}")
+    @Secured
     public String getUpdate(@PathVariable("id") Long id,  ModelMap model) {
-        if (!isAccessGranted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-
         model.addAttribute("action", Path.FLOWER_UPDATE.getValue());
         model.addAttribute("flower", flowerService.find(id));
 
@@ -97,10 +91,8 @@ public class FlowerController {
     //  POST
 
     @PostMapping("new")
+    @Secured
     public String postNew(@RequestParam String name, @RequestParam String price, @RequestParam String count, ModelMap model) {
-        if (!isAccessGranted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-
         try {
             flowerService.create(parseFlower(null, name, price, count));
         } catch (FlowerValidationException e) {
@@ -117,10 +109,8 @@ public class FlowerController {
     }
 
     @PostMapping("update/{id}")
+    @Secured
     public String postUpdate(@PathVariable("id") Long id,@RequestParam String name, @RequestParam String price, @RequestParam String count, ModelMap model) {
-        if (!isAccessGranted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-
         try {
             flowerService.create(parseFlower(id, name, price, count));
         } catch (FlowerValidationException e) {
@@ -138,10 +128,8 @@ public class FlowerController {
     }
 
     @PostMapping("delete/{id}")
+    @Secured
     public String postDelete(@PathVariable("id") Long id) {
-        if (!isAccessGranted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-
         flowerService.delete(id);
 
         return redirect(Path.FLOWER_INDEX.getValue());
@@ -197,11 +185,5 @@ public class FlowerController {
         User sessionUser = (User) httpSession.getAttribute(flowershop.backend.enums.SessionAttribute.USER.getValue());
         sessionUser = sessionUser == null ? null : userService.find(sessionUser.getLogin());
         httpSession.setAttribute(SessionAttribute.USER.getValue(), sessionUser);
-    }
-
-    private boolean isAccessGranted() {
-        System.out.println("access granted, you are " + httpSession.getAttribute(SessionAttribute.USER.getValue()));
-        User user = (User) httpSession.getAttribute(SessionAttribute.USER.getValue());
-        return (user != null && user.isAdmin());
     }
 }

@@ -29,7 +29,8 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jersey'
-    
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
+
 //  Tomcat
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: '9.0.19'

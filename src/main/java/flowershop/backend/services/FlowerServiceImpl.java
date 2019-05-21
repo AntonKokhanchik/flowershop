@@ -1,19 +1,15 @@
 package flowershop.backend.services;
 
-import com.querydsl.core.BooleanBuilder;
-import flowershop.backend.entity.QFlowerEntity;
-import flowershop.backend.repository.FlowerRepository;
-import flowershop.frontend.dto.Flower;
 import flowershop.backend.entity.FlowerEntity;
 import flowershop.backend.exception.FlowerValidationException;
+import flowershop.backend.repository.FlowerDAO;
+import flowershop.frontend.dto.Flower;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -24,7 +20,7 @@ import java.util.List;
 public class FlowerServiceImpl implements FlowerService {
     private static final Logger LOG = LoggerFactory.getLogger(FlowerServiceImpl.class);
     @Autowired
-    private FlowerRepository flowerRepository;
+    private FlowerDAO flowerRepository;
 
     @Autowired
     private Mapper mapper;
@@ -38,8 +34,8 @@ public class FlowerServiceImpl implements FlowerService {
     public void create(Flower flower) throws FlowerValidationException {
         validate(flower);
 
-        FlowerEntity savedFlower = flowerRepository.save(mapper.map(flower, FlowerEntity.class));
-        LOG.info("Flower created: {}", savedFlower);
+        flowerRepository.save(mapper.map(flower, FlowerEntity.class));
+        LOG.info("Flower created: {}", flower);
     }
 
     @Override
@@ -47,8 +43,8 @@ public class FlowerServiceImpl implements FlowerService {
     public void update(Flower flower) throws FlowerValidationException {
         validate(flower);
 
-        FlowerEntity savedFlower = flowerRepository.save(mapper.map(flower, FlowerEntity.class));
-        LOG.info("Flower updated: {}", savedFlower);
+        flowerRepository.save(mapper.map(flower, FlowerEntity.class));
+        LOG.info("Flower updated: {}", flower);
     }
 
     @Override
@@ -74,25 +70,8 @@ public class FlowerServiceImpl implements FlowerService {
 
     @Override
     public List<Flower> getAll(String name, BigDecimal priceMin, BigDecimal priceMax, String sort, String order) {
-        QFlowerEntity flower = QFlowerEntity.flowerEntity;
 
-        BooleanBuilder p = new BooleanBuilder();
-        if (!StringUtils.isEmpty(name))
-            p.and(flower.name.containsIgnoreCase(name));
-
-        if(priceMin != null)
-            p.and(flower.price.goe(priceMin));
-
-        if(priceMax != null)
-            p.and(flower.price.loe(priceMax));
-
-        if (StringUtils.isEmpty(sort))
-            sort="name";
-
-        if (StringUtils.isEmpty(order))
-            order="asc";
-
-        List<FlowerEntity> entities = (List<FlowerEntity>) flowerRepository.findAll(p, Sort.by(Sort.Direction.fromString(order), sort));
+        List<FlowerEntity> entities = flowerRepository.findAll(name, priceMin, priceMax, sort, order);
 
         List<Flower> flowers = new LinkedList<>();
 

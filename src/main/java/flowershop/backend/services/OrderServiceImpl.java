@@ -1,6 +1,6 @@
 package flowershop.backend.services;
 
-import flowershop.backend.repository.FlowerRepository;
+import flowershop.backend.repository.FlowerDAO;
 import flowershop.backend.repository.OrderRepository;
 import flowershop.backend.repository.UserRepository;
 import flowershop.frontend.dto.Flower;
@@ -30,7 +30,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
-    private FlowerRepository flowerRepository;
+    private FlowerDAO flowerRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired

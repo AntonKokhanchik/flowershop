@@ -108,11 +108,11 @@ public class FlowerController {
         return redirect(Path.FLOWER_INDEX.getValue());
     }
 
-    @PostMapping("update/{id}")
+    @PostMapping("update")
     @Secured
-    public String postUpdate(@PathVariable("id") Long id,@RequestParam String name, @RequestParam String price, @RequestParam String count, ModelMap model) {
+    public String postUpdate(@RequestParam("id") Long id, @RequestParam String name, @RequestParam String price, @RequestParam String count, ModelMap model) {
         try {
-            flowerService.create(parseFlower(id, name, price, count));
+            flowerService.update(parseFlower(id, name, price, count));
         } catch (FlowerValidationException e) {
             handleValidationError(e, model);
 

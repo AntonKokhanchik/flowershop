@@ -61,7 +61,7 @@ public class OrderController {
         Order order = orderService.find(id);
         User sessionUser = (User) httpSession.getAttribute(SessionAttribute.USER.getValue());
 
-        if (!sessionUser.getLogin().equals(order.getOwner().getLogin()))
+        if (sessionUser == null || !sessionUser.isAdmin() && !sessionUser.getLogin().equals(order.getOwner().getLogin()))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
         model.addAttribute("order", order);
@@ -74,7 +74,7 @@ public class OrderController {
     // POST
 
     @PostMapping("new")
-    public String postNew(@PathVariable Long id, ModelMap model) {
+    public String postNew() {
         Cart cart = (Cart) httpSession.getAttribute(SessionAttribute.CART.getValue());
 
         try {

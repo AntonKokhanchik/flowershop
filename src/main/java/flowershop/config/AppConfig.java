@@ -1,7 +1,12 @@
 package flowershop.config;
 
+import flowershop.backend.repository.FlowersDaoCustom;
 import flowershop.backend.services.XMLConverter;
 import org.dozer.DozerBeanMapper;
+import org.jooq.generated.tables.daos.OrderFlowersDao;
+import org.jooq.generated.tables.daos.OrdersDao;
+import org.jooq.generated.tables.daos.UsersDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,7 +25,7 @@ public class AppConfig {
     @Bean(name = "org.dozer.Mapper")
     public DozerBeanMapper mapper() {
         DozerBeanMapper dozerBean = new DozerBeanMapper();
-        dozerBean.setMappingFiles(Arrays.asList("dozerJdk8Converters.xml"));
+        dozerBean.setMappingFiles(Arrays.asList("classPath:dozer.xml"));
         return dozerBean;
     }
 
@@ -39,4 +44,28 @@ public class AppConfig {
         convertor.setUnmarshaller(marshaller);
         return convertor;
     }
+
+    // Jooq DAOs
+    @Autowired
+    org.jooq.Configuration configuration;
+    @Bean
+    FlowersDaoCustom flowersDao () {
+        return new FlowersDaoCustom(configuration);
+    }
+
+    @Bean
+    UsersDao usersDao () {
+        return new UsersDao(configuration);
+    }
+
+    @Bean
+    OrdersDao ordersDao () {
+        return new OrdersDao(configuration);
+    }
+
+    @Bean
+    OrderFlowersDao orderFlowersDao () {
+        return new OrderFlowersDao(configuration);
+    }
+
 }

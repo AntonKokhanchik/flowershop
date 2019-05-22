@@ -1,18 +1,20 @@
 package flowershop.backend.services;
 
-import flowershop.backend.repository.FlowerDAO;
-import flowershop.backend.repository.OrderRepository;
-import flowershop.backend.repository.UserRepository;
-import flowershop.frontend.dto.Flower;
-import flowershop.frontend.dto.OrderFlowerData;
-import flowershop.backend.entity.OrderFlowerDataEntity;
 import flowershop.backend.enums.OrderStatus;
-import flowershop.frontend.dto.Order;
-import flowershop.frontend.dto.User;
-import flowershop.backend.entity.OrderEntity;
-import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.FlowerValidationException;
+import flowershop.backend.repository.FlowersDaoCustom;
+import flowershop.frontend.dto.Flower;
+import flowershop.frontend.dto.Order;
+import flowershop.frontend.dto.OrderFlowerData;
+import flowershop.frontend.dto.User;
 import org.dozer.Mapper;
+import org.jooq.generated.tables.daos.OrderFlowersDao;
+import org.jooq.generated.tables.daos.OrdersDao;
+import org.jooq.generated.tables.daos.UsersDao;
+import org.jooq.generated.tables.pojos.Flowers;
+import org.jooq.generated.tables.pojos.OrderFlowers;
+import org.jooq.generated.tables.pojos.Orders;
+import org.jooq.generated.tables.pojos.Users;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -28,11 +31,13 @@ public class OrderServiceImpl implements OrderService {
     private static final Logger LOG = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
-    private OrderRepository orderRepository;
+    private OrdersDao ordersDao;
     @Autowired
-    private FlowerDAO flowerRepository;
+    private FlowersDaoCustom flowersDao;
     @Autowired
-    private UserRepository userRepository;
+    private UsersDao usersDao;
+    @Autowired
+    private OrderFlowersDao orderFlowersDao;
     @Autowired
     private Mapper mapper;
 
@@ -47,115 +52,126 @@ public class OrderServiceImpl implements OrderService {
         // decrease flowers count
         // TODO: здесь надо продумать изменение количества цветов между созданием корзины и созданием заказа
         for (Map.Entry<Long, Integer> item : cart.getItems().entrySet()) {
-            Optional<Boolean> isExceptionNeeded = flowerRepository.findById(item.getKey()).map(flowerEntity -> {
-                flowerEntity.setCount(flowerEntity.getCount() - item.getValue());
+            Flowers flower = flowersDao.fetchOneById(item.getKey());
 
-                if (flowerEntity.getCount() < 0)
-                    return true;
+            flower.setFlowerCount(flower.getFlowerCount() - item.getValue());
 
-                flowerRepository.save(flowerEntity);
-                return false;
-            });
-
-            if (isExceptionNeeded.isPresent() && isExceptionNeeded.get())
+            if (flower.getFlowerCount() < 0)
                 throw new FlowerValidationException(FlowerValidationException.NOT_ENOUGH_FLOWERS);
+
+            flowersDao.update(flower);
         }
 
         DetailedCart detailedCart = generateDetailedCart(cart);
 
         // create order
-        OrderEntity orderEntity = mapper.map(
+        Orders orderEntity = mapper.map(
                 new Order(detailedCart.getResult(user.getDiscount()), user.getDiscount()),
-                OrderEntity.class);
+                Orders.class);
 
         // add flower data
         for (OrderFlowerData f : detailedCart.getItems()) {
-            OrderFlowerDataEntity fe = mapper.map(f, OrderFlowerDataEntity.class);
-            orderEntity.addFlowerData(fe);
+            OrderFlowers fe = mapper.map(f, OrderFlowers.class);
+
+            fe.setOrderId(orderEntity.getId());
+            orderFlowersDao.insert(fe);
         }
 
         // set owner
-        userRepository.findById(user.getLogin()).ifPresent(userEntity -> {
-            orderEntity.setOwner(userEntity);
+        Users userEntity = usersDao.findById(user.getLogin());
+            orderEntity.setOwnerLogin(userEntity.getLogin());
 
-            // save
-            OrderEntity savedOrder = orderRepository.save(orderEntity);
-            LOG.info("Order created: {}", savedOrder);
-        });
+        // save
+        ordersDao.insert(orderEntity);
+        LOG.info("Order created: {}", orderEntity);
     }
 
     @Override
     public void pay(Order order) {
-        orderRepository.findById(order.getId()).ifPresent(orderEntity -> {
-            UserEntity owner = orderEntity.getOwner();
+        Orders orderEntity = ordersDao.findById(order.getId());
+        Users owner = usersDao.findById(orderEntity.getOwnerLogin());
 
-            owner.setBalance(owner.getBalance().subtract(orderEntity.getFullPrice()));
-            userRepository.save(owner);
+        owner.setBalance(owner.getBalance().subtract(orderEntity.getFullPrice()));
+        usersDao.update(owner);
 
-            orderEntity.setStatus(OrderStatus.PAID);
-            orderEntity = orderRepository.save(orderEntity);
-            LOG.info("Order paid: {}", orderEntity);
-        });
+        orderEntity.setStatus(OrderStatus.PAID.name());
+        ordersDao.update(orderEntity);
+
+        LOG.info("Order paid: {}", orderEntity);
     }
 
     @Override
     public void close(Order order) {
-        orderRepository.findById(order.getId()).ifPresent(orderEntity -> {
-            orderEntity.setStatus(OrderStatus.CLOSED);
-            orderEntity.setDateClosing(LocalDateTime.now());
+        Orders orderEntity = ordersDao.findById(order.getId());
+        orderEntity.setStatus(OrderStatus.CLOSED.name());
+        orderEntity.setDateClosing(Timestamp.valueOf(LocalDateTime.now()));
 
-            orderEntity = orderRepository.save(orderEntity);
-            LOG.info("Order closed {}", orderEntity);
-        });
+        ordersDao.update(orderEntity);
+        LOG.info("Order closed {}", orderEntity);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        orderRepository.deleteById(id);
+        orderFlowersDao.delete(orderFlowersDao.fetchByOrderId(id));
+        ordersDao.deleteById(id);
         LOG.info("Order with id {} deleted", id);
     }
 
     @Override
     public Order find(Long id) {
-        return orderRepository.findById(id).map(entity -> mapper.map(entity, Order.class)).orElse(null);
+        Orders entity = ordersDao.findById(id);
+        Order order = mapper.map(entity, Order.class);
+
+        order.setOwner(mapper.map(usersDao.findById(entity.getOwnerLogin()), User.class));
+
+        return order;
     }
 
     @Override
     public List<Order> getAll() {
         List<Order> orders = new LinkedList<>();
 
-        for (OrderEntity e : orderRepository.findAll())
-            orders.add(mapper.map(e, Order.class));
+        for (Orders e : ordersDao.findAll()) {
+            Order order = mapper.map(e, Order.class);
+            order.setOwner(mapper.map(usersDao.findById(e.getOwnerLogin()), User.class));
+
+            orders.add(order);
+        }
 
         return orders;
     }
 
-    @Transactional
     @Override
     public List<Order> getByUser(User user) {
         List<Order> orders = new LinkedList<>();
 
-        userRepository.findById(user.getLogin()).ifPresent(orderEntity -> {
-            List<OrderEntity> entities = orderEntity.getOrders();
+        user = mapper.map(usersDao.findById(user.getLogin()), User.class);
 
-            for (OrderEntity e : entities)
-                orders.add(mapper.map(e, Order.class));
-        });
+        List<Orders> entities = ordersDao.fetchByOwnerLogin(user.getLogin());
+
+        for (Orders e : entities) {
+            Order order = mapper.map(e, Order.class);
+            order.setOwner(user);
+
+            orders.add(order);
+        }
 
         return orders;
     }
 
-    @Transactional
     @Override
     public List<OrderFlowerData> getFlowersData(Order order) {
         List<OrderFlowerData> flowersData = new LinkedList<>();
+        order = find(order.getId());
 
-        orderRepository.findById(order.getId()).ifPresent(orderEntity -> {
-            List<OrderFlowerDataEntity> entities = orderEntity.getFlowersData();
+        List<OrderFlowers> entities = orderFlowersDao.fetchByOrderId(order.getId());
 
-            for (OrderFlowerDataEntity e : entities)
-                flowersData.add(mapper.map(e, OrderFlowerData.class));
-        });
+        for (OrderFlowers e : entities) {
+            OrderFlowerData f = mapper.map(e, OrderFlowerData.class);
+            f.setOrder(order);
+            flowersData.add(f);
+        }
 
         return flowersData;
     }
@@ -164,9 +180,10 @@ public class OrderServiceImpl implements OrderService {
     public DetailedCart generateDetailedCart(Cart cart) {
         Set<OrderFlowerData> items = new HashSet<>();
 
+        Object entity;
         for (Map.Entry<Long, Integer> entry : cart.getItems().entrySet())
-            flowerRepository.findById(entry.getKey()).ifPresent(entity ->
-                    items.add(mapper.map(entity, Flower.class).toOrderData(entry.getValue()))
+            items.add(
+                    mapper.map(flowersDao.findById(entry.getKey()), Flower.class).toOrderData(entry.getValue())
             );
         return new DetailedCart(items);
     }

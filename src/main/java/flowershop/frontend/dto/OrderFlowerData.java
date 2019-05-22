@@ -1,16 +1,11 @@
 package flowershop.frontend.dto;
 
-import flowershop.backend.entity.OrderFlowerDataEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-/**
- * DTO for OrderFlowerDataEntity
- * @see OrderFlowerDataEntity
- */
 public class OrderFlowerData implements Serializable {
     private Long id;
     private String flowerName;

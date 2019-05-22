@@ -1,11 +1,10 @@
 package flowershop.backend.services;
 
-import flowershop.backend.repository.UserRepository;
-import flowershop.frontend.dto.User;
-import flowershop.backend.entity.UserEntity;
 import flowershop.backend.exception.UserValidationException;
+import flowershop.frontend.dto.User;
 import org.dozer.Mapper;
-import org.glassfish.jersey.internal.util.Property;
+import org.jooq.generated.tables.daos.UsersDao;
+import org.jooq.generated.tables.pojos.Users;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class UserServiceImpl implements UserService {
     private XMLConverter converter;
 
     @Autowired
-    private UserRepository userRepository;
+    private UsersDao usersDao;
 
     @Autowired
     private Mapper mapper;
@@ -45,44 +44,45 @@ public class UserServiceImpl implements UserService {
         user.setBalance(new BigDecimal(2000));
         user.setDiscount(0);
 
-        UserEntity savedUser = userRepository.save(mapper.map(user, UserEntity.class));
-        LOG.info("User created: {}", savedUser);
+        usersDao.insert(mapper.map(user, Users.class));
+        LOG.info("User created: {}", user);
 
         createXML(user);
     }
 
     @Override
     public void update(User user) {
-        userRepository.findById(user.getLogin()).ifPresent(userEntity -> {
-            userEntity.setPassword(user.getPassword());
-            userEntity.setFullName(user.getFullName());
-            userEntity.setAddress(user.getAddress());
-            userEntity.setPhone(user.getPhone());
-            userEntity.setDiscount(user.getDiscount());
-            userEntity.setBalance(user.getBalance());
+        Users userEntity = usersDao.findById(user.getLogin());
+        userEntity.setPassword(user.getPassword());
+        userEntity.setFullName(user.getFullName());
+        userEntity.setAddress(user.getAddress());
+        userEntity.setPhone(user.getPhone());
+        userEntity.setDiscount(user.getDiscount());
+        userEntity.setBalance(user.getBalance());
 
-            userEntity = userRepository.save(userEntity);
-            LOG.info("User updated to {}", userEntity);
-        });
+        usersDao.update(userEntity);
+        LOG.info("User updated to {}", userEntity);
     }
 
     @Override
     public void delete(String login) {
-        userRepository.deleteById(login);
+        usersDao.deleteById(login);
         LOG.info("User with login {} deleted", login);
     }
 
     @Override
     public User find(String login) {
-        return userRepository.findById(login).map(entity -> mapper.map(entity, User.class)).orElse(null);
+        Users entity = usersDao.findById(login);
+
+        return entity == null ? null : mapper.map(entity, User.class);
     }
 
     @Override
     public List<User> getAll() {
-        List<UserEntity> entities = userRepository.findAll();
+        List<Users> entities = usersDao.findAll();
         List<User> users = new LinkedList<>();
 
-        for (UserEntity e : entities)
+        for (Users e : entities)
             users.add(mapper.map(e, User.class));
 
         return users;
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User verify(User user) throws UserValidationException {
-        UserEntity userEntity = userRepository.findById(user.getLogin()).orElse(null);
+        Users userEntity = usersDao.findById(user.getLogin());
 
         if (userEntity == null)
             throw new UserValidationException(UserValidationException.WRONG_LOGIN);

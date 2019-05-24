@@ -15,7 +15,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.castor.CastorMarshaller;
 
-import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @ServletComponentScan(basePackages = {"flowershop.frontend.servlets"})
@@ -25,7 +25,7 @@ public class AppConfig {
     @Bean(name = "org.dozer.Mapper")
     public DozerBeanMapper mapper() {
         DozerBeanMapper dozerBean = new DozerBeanMapper();
-        dozerBean.setMappingFiles(Arrays.asList("classPath:dozer.xml"));
+        dozerBean.setMappingFiles(List.of("classPath:dozer.xml"));
         return dozerBean;
     }
 

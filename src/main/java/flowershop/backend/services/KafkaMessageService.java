@@ -40,11 +40,6 @@ public class KafkaMessageService {
         LOG.info("KafkaMessage service on");
     }
 
-    public void init2() {
-        LOG.info("starting listener");
-
-    }
-
     public void sendNewUserXml(User user) {
         try {
             String message = converter.convertFromObjectToXMLString(user);

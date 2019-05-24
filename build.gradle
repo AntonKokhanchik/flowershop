@@ -50,6 +50,7 @@ dependencies {
     compile group: 'org.springframework', name: 'spring-oxm', version: '5.1.7.RELEASE'
     // web-service
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jersey'
+    compile group: 'org.springframework.kafka', name: 'spring-kafka'
 }
 
 def props = new Properties()
@@ -130,4 +131,5 @@ jooq {
     }
 }
 
+// generate codes after db migration
 generateSampleJooqSchemaSource.dependsOn update

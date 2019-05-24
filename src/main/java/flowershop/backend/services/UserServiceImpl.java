@@ -29,6 +29,9 @@ public class UserServiceImpl implements UserService {
     private XMLConverter converter;
 
     @Autowired
+    private KafkaMessageService messageService;
+
+    @Autowired
     private UsersDao usersDao;
 
     @Autowired
@@ -48,6 +51,7 @@ public class UserServiceImpl implements UserService {
         LOG.info("User created: {}", user);
 
         createXML(user);
+        messageService.sendNewUserXml(user);
     }
 
     @Override

@@ -69,6 +69,9 @@ public class OrderServiceImpl implements OrderService {
                 new Order(detailedCart.getResult(user.getDiscount()), user.getDiscount()),
                 Orders.class);
 
+        // id will appear here
+        ordersDao.insert(orderEntity);
+
         // add flower data
         for (OrderFlowerData f : detailedCart.getItems()) {
             OrderFlowers fe = mapper.map(f, OrderFlowers.class);
@@ -82,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
             orderEntity.setOwnerLogin(userEntity.getLogin());
 
         // save
-        ordersDao.insert(orderEntity);
+        ordersDao.update(orderEntity);
         LOG.info("Order created: {}", orderEntity);
     }
 

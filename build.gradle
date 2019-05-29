@@ -23,38 +23,43 @@ repositories {
 
 
 dependencies {
-//  Spring
+    //  Spring
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
 
-//  Tomcat
+    //  Tomcat
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: '9.0.19'
     compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '9.0.19'
 
-//    For views
+    //  For views
     compile group: 'javax.servlet', name: 'jstl', version: '1.2'
 
-//    Database
-    compile group: 'com.h2database', name: 'h2', version: '1.4.199'
+    //  Database
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jooq'
 
-//      dto <-> entity mapping
+    //  dto <-> entity mapping
     compile group: 'net.sf.dozer', name: 'dozer', version: '5.5.1'
 
-//    Marshalling
+    //  Marshalling
     compile group: 'org.codehaus.castor', name: 'castor-xml', version: '1.4.1'
     compile group: 'xerces', name: 'xercesImpl', version: '2.12.0'
     compile group: 'org.springframework', name: 'spring-oxm', version: '5.1.7.RELEASE'
-    // web-service
+
+    //  web-service
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jersey'
     compile group: 'org.springframework.kafka', name: 'spring-kafka'
 }
 
 def props = new Properties()
-file("src/main/resources/database.properties").withInputStream { props.load(it) }
+file("gradle.properties").withInputStream { props.load(it) }
+
+ext {
+    build_database = 'org.postgresql:postgresql:42.2.5'
+}
 
 // liquibase
 buildscript {
@@ -69,20 +74,19 @@ apply plugin: 'org.liquibase.gradle'
 
 dependencies {
     liquibaseRuntime 'org.liquibase:liquibase-core:3.6.3'
-    liquibaseRuntime 'com.h2database:h2:1.4.199'
+    liquibaseRuntime "$build_database"
     liquibaseRuntime 'ch.qos.logback:logback-classic'
     liquibaseRuntime 'ch.qos.logback:logback-core'
 }
-
 
 liquibase {
     activities {
         main {
             changeLogFile 'src/main/resources/changelog.xml'
-            url props.getProperty('spring.datasource.url')
-            username props.getProperty('spring.datasource.username')
-            password props.getProperty('spring.datasource.password')
-            defaultSchemaName 'PUBLIC'
+            url props.getProperty('db.url')
+            username props.getProperty('db.user')
+            password props.getProperty('db.password')
+            defaultSchemaName 'public'
         }
     }
     runList = 'main'
@@ -103,7 +107,7 @@ buildscript {
 apply plugin: "nu.studer.jooq"
 
 dependencies {
-    jooqRuntime "com.h2database:h2:1.4.199"
+    jooqRuntime "$build_database"
 }
 
 jooq {
@@ -111,15 +115,15 @@ jooq {
     edition = 'OSS'
     sample(sourceSets.main) {
         jdbc {
-            driver = props.getProperty('spring.datasource.driverClassName')
-            url =  props.getProperty('spring.datasource.url')
-            user = props.getProperty('spring.datasource.username')
-            password = props.getProperty('spring.datasource.password')
+            driver = props.getProperty('db.driver')
+            url = props.getProperty('db.url')
+            user = props.getProperty('db.user')
+            password = props.getProperty('db.password')
         }
         generator {
             database {
-                name = 'org.jooq.meta.h2.H2Database'
-                inputSchema = 'PUBLIC'
+                name = 'org.jooq.meta.postgres.PostgresDatabase'
+                inputSchema = 'public'
             }
             generate {
                 deprecated = false
@@ -133,3 +137,28 @@ jooq {
 
 // generate codes after db migration
 generateSampleJooqSchemaSource.dependsOn update
+
+// docker-compose
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.avast.gradle:gradle-docker-compose-plugin:0.9.4"
+    }
+}
+
+apply plugin: 'docker-compose'
+
+dockerCompose {
+    // запускаем во время билда вокруг генерации кода jooq
+    postgres {
+        startedServices = ['postgres']
+        isRequiredBy(generateSampleJooqSchemaSource)
+    }
+    // запускаем во время исполнения
+    kafka {
+        startedServices = ['kafka']
+        isRequiredBy(bootRun)
+    }
+}

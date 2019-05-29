@@ -1,5 +1,5 @@
 create table ORDER_FLOWERS(
-    id bigint primary key auto_increment,
+    id bigserial primary key,
     flowerName varchar(30) not null,
     price decimal check (price >= 0),
     count int check (count >= 0),
@@ -8,8 +8,8 @@ create table ORDER_FLOWERS(
 );
 
 -- some test values
-insert into ORDER_FLOWERS values (null, 'Mandrake', 300, 1, 1);
-insert into ORDER_FLOWERS values (null, 'Managrass', 50, 3, 2);
-insert into ORDER_FLOWERS values (null, 'Mandrake', 300, 1, 3);
-insert into ORDER_FLOWERS values (null, 'Managrass', 50, 4, 3);
-insert into ORDER_FLOWERS values (null, 'Managrass', 50, 4, 4);
+insert into ORDER_FLOWERS values (default, 'Mandrake', 300, 1, 1);
+insert into ORDER_FLOWERS values (default, 'Managrass', 50, 3, 2);
+insert into ORDER_FLOWERS values (default, 'Mandrake', 300, 1, 3);
+insert into ORDER_FLOWERS values (default, 'Managrass', 50, 4, 3);
+insert into ORDER_FLOWERS values (default, 'Managrass', 50, 4, 4);

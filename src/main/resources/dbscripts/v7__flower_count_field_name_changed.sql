@@ -1,1 +1,1 @@
-alter table FLOWERS alter column count rename to flower_count;
+alter table FLOWERS rename column count to flower_count;

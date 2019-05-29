@@ -1,5 +1,5 @@
 create table ORDERS(
-    id bigint primary key auto_increment,
+    id bigserial primary key,
     fullPrice decimal not null check (fullPrice >= 0),
     dateCreation timestamp not null,
     dateClosing timestamp,
@@ -9,7 +9,7 @@ create table ORDERS(
 );
 
 -- some test values
-insert into ORDERS values (null, 300, '2019-04-15 10:00:00', null, 'CREATED', 'login1');
-insert into ORDERS values (null, 150, '2019-03-15 10:00:00', '2019-03-17 10:00:00', 'CLOSED', 'login1');
-insert into ORDERS values (null, 500, '2019-04-15 12:00:00', null, 'PAID', 'login1');
-insert into ORDERS values (null, 200, '2019-04-13 12:00:00', null, 'CREATED', 'login2');
+insert into ORDERS values (default, 300, '2019-04-15 10:00:00', null, 'CREATED', 'login1');
+insert into ORDERS values (default, 150, '2019-03-15 10:00:00', '2019-03-17 10:00:00', 'CLOSED', 'login1');
+insert into ORDERS values (default, 500, '2019-04-15 12:00:00', null, 'PAID', 'login1');
+insert into ORDERS values (default, 200, '2019-04-13 12:00:00', null, 'CREATED', 'login2');

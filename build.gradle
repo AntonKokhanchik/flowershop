@@ -54,6 +54,13 @@ dependencies {
     compile group: 'org.springframework.kafka', name: 'spring-kafka'
 }
 
+apply plugin: flowershop.greeting.GreetingPlugin
+
+hello {
+    message = 'hey'
+    recipient = 'you'
+}
+
 def props = new Properties()
 file("gradle.properties").withInputStream { props.load(it) }
 

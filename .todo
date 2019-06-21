@@ -219,5 +219,8 @@ TODO:[ ] [08.05.19]
     [+] Юнит-тесты, интеграционные тесты (restTemplate)
     [x] Проверка прав юзера кастомной аннотацией + AOP
     [ ] Кэширование с помощью ehcache
-    [+] SpringBoot + docker
-    [+] Gradle
+    [x] SpringBoot + docker
+    [x] Gradle
+
+    [+] spring boot starter
+    [ ] java8 multithread ~

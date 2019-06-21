@@ -24,6 +24,8 @@ repositories {
 
 dependencies {
     //  Spring
+    compile project(':custom-starter')
+
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
@@ -40,14 +42,6 @@ dependencies {
     //  Database
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jooq'
-
-    //  dto <-> entity mapping
-    compile group: 'net.sf.dozer', name: 'dozer', version: '5.5.1'
-
-    //  Marshalling
-    compile group: 'org.codehaus.castor', name: 'castor-xml', version: '1.4.1'
-    compile group: 'xerces', name: 'xercesImpl', version: '2.12.0'
-    compile group: 'org.springframework', name: 'spring-oxm', version: '5.1.7.RELEASE'
 
     //  web-service
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jersey'

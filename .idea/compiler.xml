@@ -2,6 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="flowershop.db-generated-classes-sring-boot-starter.main" target="1.8" />
+      <module name="flowershop.db-generated-classes-sring-boot-starter.test" target="1.8" />
       <module name="flowershop.generated" target="12" />
     </bytecodeTargetLevel>
   </component>

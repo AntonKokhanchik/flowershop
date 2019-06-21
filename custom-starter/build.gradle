@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: '2.1.5.RELEASE'
+    compile("org.springframework.boot:spring-boot-autoconfigure:2.1.5.RELEASE")
+
+    //  dto <-> entity mapping
+    compile group: 'net.sf.dozer', name: 'dozer', version: '5.5.1'
+
+    //  Marshalling
+    compile group: 'org.codehaus.castor', name: 'castor-xml', version: '1.4.1'
+    compile group: 'xerces', name: 'xercesImpl', version: '2.12.0'
+    compile group: 'org.springframework', name: 'spring-oxm', version: '5.1.7.RELEASE'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+
+group = 'flowershop.starter'
+version = '1.0.0-SNAPSHOT'

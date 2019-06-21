@@ -2,6 +2,7 @@ package flowershop.backend.services;
 
 import flowershop.backend.exception.UserValidationException;
 import flowershop.frontend.dto.User;
+import flowershop.starter.XMLConverter;
 import org.dozer.Mapper;
 import org.jooq.generated.tables.daos.UsersDao;
 import org.jooq.generated.tables.pojos.Users;

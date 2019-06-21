@@ -1,4 +1,4 @@
-package flowershop.backend.services;
+package flowershop.starter;
 
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
